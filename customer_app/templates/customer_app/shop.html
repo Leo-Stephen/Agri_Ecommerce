@@ -1,0 +1,257 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Wishlist - Kisan Vishwa</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&family=Montserrat:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/CustomerNavBar.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/customerdesign.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/shop.css' %}">
+    <style>
+        body {
+            padding-top: 40px;
+            background-color: #f5f5f5;
+        }
+    </style>
+</head>
+<body>
+    {% include 'NavBar/CustomerNavBar.html' %}
+    
+    <main class="shop-container">
+        <div class="shop-header">
+            <h1>Shop Products</h1>
+            <div class="filter-container">
+                <div class="search-bar">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" 
+                           id="searchInput" 
+                           placeholder="Search products..." 
+                           value="{{ search_query|default:'' }}"
+                           autocomplete="off">
+                    <div id="searchSuggestions" class="search-suggestions"></div>
+                </div>
+                
+                <select id="categoryFilter" class="filter-select">
+                    <option value="">All Categories</option>
+                    {% for key, value in categories.items %}
+                        <option value="{{ key }}" {% if current_category == key %}selected{% endif %}>
+                            {{ value }}
+                        </option>
+                    {% endfor %}
+                </select>
+                
+                <div class="price-range">
+                    <input type="number" 
+                           id="minPrice" 
+                           placeholder="Min Price" 
+                           value="{{ min_price|default:'' }}"
+                           step="10"
+                           min="0"
+                           class="price-input">
+                    <span>-</span>
+                    <input type="number" 
+                           id="maxPrice" 
+                           placeholder="Max Price" 
+                           value="{{ max_price|default:'' }}"
+                           step="10"
+                           min="0"
+                           class="price-input">
+                </div>
+                
+                <select id="sortFilter" class="filter-select">
+                    <option value="default">Sort By</option>
+                    <option value="price_low">Price: Low to High</option>
+                    <option value="price_high">Price: High to Low</option>
+                    <option value="newest">Newest First</option>
+                </select>
+
+                <button id="clearFilters" class="clear-filters-btn">
+                    <i class="fas fa-times"></i> Clear
+                </button>
+            </div>
+        </div>
+
+        <div class="products-grid">
+            {% for product in products %}
+            <div class="product-card" data-product-id="{{ product.id }}">
+                <div class="product-image">
+                    <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                    {% csrf_token %}
+                </div>
+                <div class="product-details">
+                    <h3>{{ product.name }}</h3>
+                    <p class="product-price">₹{{ product.price }}</p>
+                    <div class="product-actions">
+                        <button class="add-to-cart-btn" 
+                                onclick="addToCart('{{ product.id }}', this)" 
+                                data-product-id="{{ product.id }}">
+                            <i class="fas fa-cart-plus"></i> Add to Cart
+                        </button>
+                        <button class="add-to-wishlist" onclick="toggleWishlist('{{ product.id }}')" aria-label="Add to wishlist">
+                            <i class="fas fa-heart {% if product in wishlist_products %}active{% endif %}"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </main>
+
+    <script>
+        let filterTimeout;
+        
+        function applyFilters() {
+            clearTimeout(filterTimeout);
+            filterTimeout = setTimeout(() => {
+                const category = document.getElementById('categoryFilter').value;
+                const minPrice = document.getElementById('minPrice').value;
+                const maxPrice = document.getElementById('maxPrice').value;
+                const sort = document.getElementById('sortFilter').value;
+                const search = document.getElementById('searchInput').value;
+
+                const url = new URL(window.location);
+                url.searchParams.set('category', category);
+                if (minPrice) url.searchParams.set('min_price', minPrice);
+                if (maxPrice) url.searchParams.set('max_price', maxPrice);
+                url.searchParams.set('sort', sort);
+                if (search) url.searchParams.set('search', search);
+
+                window.location = url;
+            }, 500);
+        }
+
+        // Add event listeners
+        document.getElementById('categoryFilter').addEventListener('change', applyFilters);
+        document.getElementById('sortFilter').addEventListener('change', applyFilters);
+        document.getElementById('minPrice').addEventListener('input', applyFilters);
+        document.getElementById('maxPrice').addEventListener('input', applyFilters);
+
+        // Search with auto-suggestions
+        document.getElementById('searchInput').addEventListener('input', async (e) => {
+            const query = e.target.value;
+            if (query.length < 2) {
+                document.getElementById('searchSuggestions').innerHTML = '';
+                return;
+            }
+
+            try {
+                const response = await fetch(`/customer/search-suggestions/?q=${query}`);
+                const data = await response.json();
+                
+                const suggestions = document.getElementById('searchSuggestions');
+                suggestions.innerHTML = data.suggestions.map(product => `
+                    <div class="suggestion-item" onclick="selectSuggestion('${product.name}')">
+                        ${product.name}
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error fetching suggestions:', error);
+            }
+        });
+
+        async function toggleWishlist(productId) {
+            try {
+                const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+                const response = await fetch(`/customer/toggle-wishlist/${productId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': csrfToken,
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    const heartIcon = document.querySelector(`[data-product-id="${productId}"] .add-to-wishlist i`);
+                    if (heartIcon) {
+                        heartIcon.classList.toggle('active');
+                    }
+                    showToast(data.message);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('Error updating wishlist');
+            }
+        }
+
+        async function addToCart(productId, button) {
+            try {
+                button.disabled = true;
+                button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                
+                const response = await fetch(`/customer/add_to_cart/${productId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}',
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // Update cart count in navbar
+                    const cartBadge = document.querySelector('.cart-count');
+                    if (cartBadge) {
+                        cartBadge.textContent = data.cart_count;
+                    }
+                    showToast(data.message);
+                    button.classList.add('success');
+                } else {
+                    throw new Error(data.message);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('Error adding to cart');
+            } finally {
+                setTimeout(() => {
+                    button.disabled = false;
+                    button.innerHTML = '<i class="fas fa-cart-plus"></i> Add to Cart';
+                    button.classList.remove('success');
+                }, 1000);
+            }
+        }
+
+        // Add toast notification function
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+
+        function adjustPrice(inputId, change) {
+            const input = document.getElementById(inputId);
+            const currentValue = parseInt(input.value) || 0;
+            input.value = Math.max(0, currentValue + change);
+            applyFilters();
+        }
+
+        function clearFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('categoryFilter').value = '';
+            document.getElementById('minPrice').value = '';
+            document.getElementById('maxPrice').value = '';
+            document.getElementById('sortFilter').value = 'default';
+            
+            // Redirect to shop page without parameters
+            window.location = window.location.pathname;
+        }
+
+        // Add event listener for clear filters button
+        document.getElementById('clearFilters').addEventListener('click', clearFilters);
+    </script>
+</body>
+</html>

@@ -1,0 +1,212 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Dashboard - Kisan Vishwa</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&family=Montserrat:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/CustomerNavBar.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/customerdesign.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/customer_dashboard.css' %}">
+</head>
+<body>
+    {% include 'NavBar/CustomerNavBar.html' %}
+    
+    <!-- Add a spacer div -->
+    <div style="height: 20px;"></div>
+    
+    <main class="dashboard-container">
+        <!-- Welcome Section -->
+        <section class="welcome-section">
+            <div class="welcome-content">
+                <h2>Welcome back, {{ user.first_name|default:user.username }}!</h2>
+                <p class="welcome-subtitle">Here's what's happening with your account today</p>
+            </div>
+            <div class="date-weather">
+                <div class="current-date">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span id="current-date"></span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Stats Grid -->
+        <section class="stats-grid">
+            <div class="stat-card orders" role="region" aria-label="Total Orders Statistics">
+                <div class="stat-icon">
+                    <i class="fas fa-shopping-bag"></i>
+                </div>
+                <div class="stat-details">
+                    <h3>Total Orders</h3>
+                    <p class="stat-number">{{ orders.count|default:"0" }}</p>
+                    <p class="stat-trend positive">
+                        <i class="fas fa-arrow-up"></i> 12% from last month
+                    </p>
+                </div>
+            </div>
+
+            <div class="stat-card cart">
+                <div class="stat-icon">
+                    <i class="fas fa-shopping-cart"></i>
+                </div>
+                <div class="stat-details">
+                    <h3>Cart Items</h3>
+                    <p class="stat-number">{{ cart_items_count|default:"0" }}</p>
+                    <a href="{% url 'customer_cart' %}" class="view-link">View Cart</a>
+                </div>
+            </div>
+
+            <div class="stat-card wishlist">
+                <div class="stat-icon">
+                    <i class="fas fa-heart"></i>
+                </div>
+                <div class="stat-details">
+                    <h3>Wishlist</h3>
+                    <p class="stat-number">{{ wishlist_count|default:"0" }}</p>
+                    <a href="{% url 'customer_wishlist' %}" class="view-link">View Wishlist</a>
+                </div>
+            </div>
+
+            <div class="stat-card savings">
+                <div class="stat-icon">
+                    <i class="fas fa-piggy-bank"></i>
+                </div>
+                <div class="stat-details">
+                    <h3>Total Savings</h3>
+                    <p class="stat-number">₹{{ total_savings|default:"0" }}</p>
+                    <p class="stat-trend positive">
+                        <i class="fas fa-arrow-up"></i> 8% from last month
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Recent Orders & Featured Products -->
+        <div class="dashboard-grid">
+            <!-- Recent Orders -->
+            <section class="recent-orders">
+                <div class="section-header">
+                    <h2>Recent Orders</h2>
+                    <a href="{% url 'customer_dashboard' %}" class="view-all">View History</a>
+                </div>
+                <div class="orders-list">
+                    {% if recent_orders %}
+                        {% for order in recent_orders %}
+                            <div class="order-card">
+                                <div class="order-image">
+                                    <img src="{{ order.product.image.url }}" alt="{{ order.product.name }}">
+                                </div>
+                                <div class="order-details">
+                                    <h3>{{ order.product.name }}</h3>
+                                    <p class="order-meta">
+                                        <span class="order-date">{{ order.created_at|date:"M d, Y" }}</span>
+                                        <span class="order-status {{ order.status|lower }}">{{ order.status }}</span>
+                                    </p>
+                                    <p class="order-price">₹{{ order.total_price }}</p>
+                                </div>
+                                <a href="#" class="track-order-btn">Track Order</a>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="no-orders">
+                            <i class="fas fa-box-open"></i>
+                            <p>No recent orders</p>
+                            <a href="{% url 'customer_dashboard' %}" class="shop-now-btn">Shop Now</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </section>
+
+            <!-- Featured Products -->
+            <section class="featured-products">
+                <div class="section-header">
+                    <h2>Featured Products</h2>
+                    <a href="{% url 'customer_dashboard' %}" class="view-all">View All</a>
+                </div>
+                <div class="products-grid">
+                    {% if featured_products %}
+                        {% for product in featured_products %}
+                            <div class="product-card" data-product-id="{{ product.id }}">
+                                <div class="product-image">
+                                    <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                                    {% csrf_token %}
+                                </div>
+                                <div class="product-details">
+                                    <h3>{{ product.name }}</h3>
+                                    <p class="product-price">₹{{ product.price }}</p>
+                                    <div class="product-actions">
+                                        <button class="add-to-cart" data-product-id="{{ product.id }}" aria-label="Add {{ product.name }} to cart">
+                                            <i class="fas fa-cart-plus"></i> Add to Cart
+                                        </button>
+                                        <button class="add-to-wishlist" onclick="toggleWishlist('{{ product.id }}')" aria-label="Add to wishlist">
+                                            <i class="fas fa-heart {% if product in wishlist_products %}active{% endif %}"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="no-products">No featured products available</p>
+                    {% endif %}
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script>
+        // Update current date
+        document.addEventListener('DOMContentLoaded', function() {
+            const dateElement = document.getElementById('current-date');
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            dateElement.textContent = new Date().toLocaleDateString('en-US', options);
+        });
+
+        async function toggleWishlist(productId) {
+            try {
+                const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+                const response = await fetch(`/customer/toggle-wishlist/${productId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': csrfToken,
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    const heartIcon = document.querySelector(`[data-product-id="${productId}"] .wishlist-btn i`);
+                    if (heartIcon) {
+                        heartIcon.classList.toggle('active');
+                    }
+                    const wishlistCount = document.querySelector('.wishlist .stat-number');
+                    if (wishlistCount) {
+                        wishlistCount.textContent = data.wishlist_count;
+                    }
+                    showToast(data.message);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('Error updating wishlist');
+            }
+        }
+
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.className = 'toast-notification';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+    </script>
+
+    <!-- Add after body tag -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+</body>
+</html>
+

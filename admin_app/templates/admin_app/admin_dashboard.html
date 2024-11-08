@@ -1,0 +1,42 @@
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="{% static 'css/admin.css' %}">
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <img src="{% static 'images/kisan_vishwa_logo.png' %}" alt="Kisan Vishwa Logo">
+        </div>
+        {% include 'NavBar/AdminNavBar.html' %}
+    </header>
+    <div class="container">
+        <h1>Admin Dashboard</h1>
+        <div class="stats">
+            <div class="stat-box">
+                <h2>Farmers</h2>
+                <p>Total Farmers: {{ farmer_count }}</p>
+                <p><a href="{% url 'admin_farmer_list' %}">View All Farmers</a></p>
+            </div>
+            <div class="stat-box">
+                <h2>Customers</h2>
+                <p>Total Customers: {{ customer_count }}</p>
+                <p><a href="{% url 'admin_customer_list' %}">View All Customers</a></p>
+            </div>
+            <div class="stat-box">
+                <h2>Products</h2>
+                <p>Total Products: {{ product_count }}</p>
+                <p><a href="{% url 'admin_product_list' %}">View All Products</a></p>
+            </div>
+            <div class="stat-box">
+                <h2>Orders</h2>
+                <p>Total Orders: {{ order_count }}</p>
+                <p><a href="{% url 'admin_order_list' %}">View All Orders</a></p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

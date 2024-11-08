@@ -1,0 +1,107 @@
+{% load static %}
+
+{% block extra_css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/farmerdesign.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/my_product.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+{% endblock %}
+
+
+    <header class="header">
+        <div class="logo">
+            <img src="{% static 'images/kisan_vishwa_logo.png' %}" alt="Kisan Vishwa Logo">
+        </div>
+        {% include 'NavBar/FarmerNavBar.html' %}
+    </header>
+
+    <!-- Add this right after the header section -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="spinner"></div>
+    </div>
+
+    <section class="hero">
+        <div class="hero-content">
+            <h1>My Products</h1>
+            <p>Manage and track all your agricultural products in one place.</p>
+            <div class="hero-features">
+                <span class="feature"><i class="fas fa-box"></i> Total Products: {{ products.count }}</span>
+                <span class="feature"><i class="fas fa-chart-line"></i> Active Listings</span>
+                <span class="feature"><i class="fas fa-clock"></i> Recent Updates</span>
+            </div>
+        </div>
+    </section>
+
+    <main class="main-content">
+        <div class="products-controls">
+            <div class="search-filter">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search products..." id="searchInput">
+                </div>
+                <div class="filter-options">
+                    <select id="categoryFilter">
+                        <option value="">All Categories</option>
+                        <option value="vegetables">Vegetables</option>
+                        <option value="fruits">Fruits</option>
+                        <option value="grains">Grains</option>
+                    </select>
+                    <select id="sortFilter"
+                            name="sort"
+                            hx-get="{% url 'sort_products' %}"
+                            hx-target="#productsGrid"
+                            hx-trigger="change"
+                            hx-indicator="#loadingOverlay">
+                        <option value="newest">Newest First</option>
+                        <option value="oldest">Oldest First</option>
+                        <option value="price-high">Price: High to Low</option>
+                        <option value="price-low">Price: Low to High</option>
+                    </select>
+                </div>
+            </div>
+            <a href="{% url 'add_product' %}" class="add-product-btn">
+                <i class="fas fa-plus"></i> Add New Product
+            </a>
+        </div>
+
+        <div id="productsGrid" class="products-grid">
+            {% include 'product_grid_partial.html' with products=products %}
+        </div>
+
+        {% if products.has_other_pages %}
+            <div class="pagination">
+                {% if products.has_previous %}
+                    <a href="?page={{ products.previous_page_number }}" class="page-link">
+                        <i class="fas fa-chevron-left"></i> Previous
+                    </a>
+                {% endif %}
+
+                {% for num in products.paginator.page_range %}
+                    {% if products.number == num %}
+                        <span class="page-link active">{{ num }}</span>
+                    {% else %}
+                        <a href="?page={{ num }}" class="page-link">{{ num }}</a>
+                    {% endif %}
+                {% endfor %}
+
+                {% if products.has_next %}
+                    <a href="?page={{ products.next_page_number }}" class="page-link">
+                        Next <i class="fas fa-chevron-right"></i>
+                    </a>
+                {% endif %}
+            </div>
+        {% endif %}
+        {% csrf_token %}
+    </main>
+
+    <!-- Edit Product Modal -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <div id="editFormContainer"></div>
+        </div>
+    </div>
+
+{% block extra_js %}
+    <script src="{% static 'js/product.js' %}"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.6"></script>
+{% endblock %}

@@ -1,0 +1,128 @@
+{% load static %}
+
+{% block extra_css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/farmerdesign.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/add_product.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+{% endblock %}
+
+{% block content %}
+    <header class="header">
+        <div class="logo">
+            <img src="{% static 'images/kisan_vishwa_logo.png' %}" alt="Kisan Vishwa Logo">
+        </div>
+        {% include 'NavBar/FarmerNavBar.html' %}
+    </header>
+
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Add New Product</h1>
+            <p>List your agricultural products for sale on Kisan Vishwa.</p>
+        </div>
+    </section>
+
+    <main class="main-content">
+        <section class="add-product-section">
+            <div class="form-container">
+                {% if messages %}
+                    <div class="messages">
+                        {% for message in messages %}
+                            <div class="message {{ message.tags }}">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <form method="POST" enctype="multipart/form-data" class="product-form">
+                    {% csrf_token %}
+                    {% for field in form %}
+                        {% if field.name == 'image' %}
+                            <div class="form-group">
+                                <label for="{{ field.id_for_label }}" class="form-label">Product Image</label>
+                                <div class="image-upload-container" onclick="document.getElementById('id_image').click();">
+                                    <div class="image-preview" id="imagePreview">
+                                        <img src="#" alt="Preview" style="display: none;">
+                                        <div class="placeholder">
+                                            <i class="fas fa-cloud-upload-alt"></i>
+                                            <p>Click here or drag and drop</p>
+                                            <span>Supported formats: JPG, PNG, GIF (max 5MB)</span>
+                                        </div>
+                                    </div>
+                                    {{ field }}
+                                </div>
+                                {% if field.errors %}
+                                    <span class="error-message">{{ field.errors.0 }}</span>
+                                {% endif %}
+                            </div>
+                        {% elif field.name == 'price' %}
+                            <div class="form-group">
+                                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                                <div class="price-input-wrapper">
+                                    {{ field }}
+                                </div>
+                                {% if field.errors %}
+                                    <span class="error-message">{{ field.errors.0 }}</span>
+                                {% endif %}
+                            </div>
+                        {% else %}
+                            <div class="form-row">
+                                <div class="form-group half">
+                                    <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                                    {{ field }}
+                                    {% if field.errors %}
+                                        <span class="error-message">{{ field.errors.0 }}</span>
+                                    {% endif %}
+                                    {% if field.help_text %}
+                                        <small class="help-text">{{ field.help_text }}</small>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Add Product
+                        </button>
+                        <a href="{% url 'farmer_dashboard' %}" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    {% block extra_js %}
+    <script>
+        const imageInput = document.getElementById('id_image');
+        const imagePreview = document.getElementById('imagePreview');
+        const previewImg = imagePreview.querySelector('img');
+        const placeholder = imagePreview.querySelector('.placeholder');
+
+        imageInput.addEventListener('change', function() {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    previewImg.src = e.target.result;
+                    previewImg.style.display = 'block';
+                    placeholder.style.display = 'none';
+                }
+                reader.readAsDataURL(file);
+            } else {
+                previewImg.style.display = 'none';
+                placeholder.style.display = 'block';
+            }
+        });
+
+        const form = document.querySelector('.product-form');
+        form.addEventListener('submit', function(e) {
+            const submitBtn = this.querySelector('button[type="submit"]');
+            submitBtn.classList.add('loading');
+            submitBtn.disabled = true;
+        });
+    </script>
+    {% endblock %}
+{% endblock %}

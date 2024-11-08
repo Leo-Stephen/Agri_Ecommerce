@@ -1,0 +1,26 @@
+<nav>
+    <ul>
+        <li><a href="{% url 'HomePage' %}">Home</a></li>
+        <li><a href="#">Shop</a></li>
+        <li><a href="#">About Us</a></li>
+        <li><a href="#">Blog</a></li>
+        <li><a href="#">Contact</a></li>
+        <li class="search-cart">
+            <input type="text" placeholder="Search...">
+            <a href="#" aria-label="Cart">🛒</a>
+            {% if user.is_authenticated %}
+                {% if user.is_superuser %}
+                    <a href="{% url 'admin_dashboard' %}" class="admin-btn">Admin Dashboard</a>
+                {% elif user.farmerprofile %}
+                     <span>Welcome {{ user.farmerprofile.name }}</span>
+                {% elif user.customerprofile %}
+                    <span>Welcome {{ user.customerprofile.name }}</span>
+                {% endif %}
+                <a href="{% url 'logout' %}" class="logout-btn">Logout</a>  <!-- Logout link added -->
+            {% else %}
+                <a href="{% url 'login' %}" class="login-btn">Login</a>
+                <a href="{% url 'register' %}" class="signup-btn">Sign Up</a>
+            {% endif %}
+        </li>
+    </ul>
+</nav>

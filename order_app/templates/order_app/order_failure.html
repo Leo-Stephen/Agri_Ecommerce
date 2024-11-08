@@ -1,0 +1,50 @@
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Failure</title>
+    <link rel="stylesheet" href="{% static 'css/cart.css' %}">
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <img src="{% static 'images/kisan_vishwa_logo.png' %}" alt="Kisan Vishwa Logo">
+        </div>
+        {% include 'NavBar/CustomerNavBar.html' %}
+    </header>
+
+    <main>
+        <h1>Payment Failed</h1>
+        <p>Unfortunately, your payment was unsuccessful. Please try again or contact support if you continue to experience issues.</p>
+
+        {% if orders %}
+            <div class="cart-container">
+                {% for order in orders %}
+                    <div class="cart-item">
+                        <div class="product-image">
+                            <img src="{{ order.product.image.url }}" alt="{{ order.product.name }}" width="100" height="100">
+                        </div>
+                        <div class="product-details">
+                            <p><strong>{{ order.product.name }}</strong></p>
+                            <p>Quantity: {{ order.quantity }}</p>
+                            <p>Price: ${{ order.product.price|floatformat:2 }}</p>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <div class="total-summary">
+                <p><strong>Total Amount Due: ${{ total_price|floatformat:2 }}</strong></p>
+            </div>
+        {% else %}
+            <p>No items to display.</p>
+        {% endif %}
+
+        <div class="action-buttons">
+            <a href="{% url 'view_cart' %}" class="btn-retry">Retry Payment</a>
+            <a href="{% url 'customer_dashboard' %}" class="btn-back">Back to Dashboard</a>
+        </div>
+    </main>
+</body>
+</html>

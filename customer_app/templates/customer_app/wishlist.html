@@ -1,0 +1,209 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Wishlist - Kisan Vishwa</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&family=Montserrat:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/CustomerNavBar.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/customerdesign.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/wishlist.css' %}">
+    <style>
+        body {
+            padding-top: 70px;
+            background-color: #f5f5f5;
+        }
+    </style>
+</head>
+<body>
+    {% include 'NavBar/CustomerNavBar.html' %}
+    {% csrf_token %}
+    
+    <main class="main-container">
+        <div class="wishlist-header">
+            <h1>My Wishlist</h1>
+            <div class="wishlist-summary">
+                <span>{{ wishlist_items|length }} items</span>
+            </div>
+        </div>
+
+        
+        {% if wishlist_items %}
+            <div class="wishlist-grid">
+                {% for item in wishlist_items %}
+                    <div class="wishlist-card" data-product-id="{{ item.product.id }}">
+                        <div class="wishlist-image">
+                            <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}">
+                        </div>
+                        <div class="wishlist-content">
+                            <h2>{{ item.product.name }}</h2>
+                            <p class="price">₹{{ item.product.price }}</p>
+                            <div class="wishlist-actions">
+                                <button onclick="addToCart('{{ item.product.id }}', this)" class="add-to-cart-btn">
+                                    <i class="fas fa-shopping-cart"></i> Add to Cart
+                                </button>
+                                <button onclick="toggleWishlist('{{ item.product.id }}')" class="remove-btn">
+                                    <i class="fas fa-trash"></i> Remove
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-wishlist">
+                <i class="far fa-heart"></i>
+                <h2>Your wishlist is empty</h2>
+                <p>Add items that you like to your wishlist</p>
+                <a href="{% url 'customer_dashboard' %}" class="start-shopping-btn">
+                    Start Shopping
+                </a>
+            </div>
+        {% endif %}
+    </main>
+
+    <script>
+        async function toggleWishlist(productId) {
+            try {
+                const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+                const response = await fetch(`/customer/toggle-wishlist/${productId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': csrfToken,
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    const card = document.querySelector(`.wishlist-card[data-product-id="${productId}"]`);
+                    if (card) {
+                        card.style.animation = 'fadeOut 0.3s';
+                        setTimeout(() => {
+                            card.remove();
+                            updateWishlistCount();
+                        }, 300);
+                    }
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        function updateWishlistCount() {
+            const count = document.querySelectorAll('.wishlist-card').length;
+            document.querySelector('.wishlist-summary span').textContent = `${count} items`;
+            
+            if (count === 0) {
+                document.querySelector('.wishlist-grid').innerHTML = `
+                    <div class="empty-wishlist">
+                        <i class="far fa-heart"></i>
+                        <h2>Your wishlist is empty</h2>
+                        <p>Add items that you like to your wishlist</p>
+                        <a href="{% url 'customer_dashboard' %}" class="start-shopping-btn">Start Shopping</a>
+                    </div>
+                `;
+            }
+        }
+
+        async function addToCart(productId, button) {
+            try {
+                button.disabled = true;
+                button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                
+                const response = await fetch(`/customer/add_to_cart/${productId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    updateCartCount(data.cart_count);
+                    showToast('Item added to cart successfully');
+                } else {
+                    throw new Error(data.message);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('Error adding to cart');
+            } finally {
+                button.disabled = false;
+                button.innerHTML = '<i class="fas fa-cart-plus"></i> Add to Cart';
+            }
+        }
+
+        async function removeFromWishlist(productId) {
+            try {
+                const response = await fetch(`/customer/toggle-wishlist/${productId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    const card = document.querySelector(`.wishlist-card[data-product-id="${productId}"]`);
+                    if (card) {
+                        card.style.animation = 'fadeOut 0.3s ease';
+                        setTimeout(() => {
+                            card.remove();
+                            updateWishlistCount(data.wishlist_count);
+                            checkEmptyWishlist();
+                        }, 300);
+                    }
+                    showToast('Item removed from wishlist');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('Error removing from wishlist');
+            }
+        }
+
+        function updateCartCount(count) {
+            const cartCount = document.querySelector('.cart-count');
+            if (cartCount) {
+                cartCount.textContent = count;
+            }
+        }
+
+        function checkEmptyWishlist() {
+            const wishlistItems = document.querySelectorAll('.wishlist-card');
+            if (wishlistItems.length === 0) {
+                const container = document.querySelector('.wishlist-container');
+                if (container) {
+                    container.innerHTML = `
+                        <div class="empty-wishlist">
+                            <i class="fas fa-heart-broken"></i>
+                            <h2>Your wishlist is empty</h2>
+                            <p>Add items to your wishlist while shopping</p>
+                            <a href="/customer/shop/" class="shop-now-btn">Shop Now</a>
+                        </div>
+                    `;
+                }
+            }
+        }
+
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+    </script>
+</body>
+</html>
