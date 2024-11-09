@@ -31,6 +31,10 @@ class ProductForm(forms.ModelForm):
                 'rows': 4,
                 'placeholder': 'Product Description'
             }),
+            'image': forms.FileInput(attrs={
+                'class': 'form-input',
+                'accept': 'image/*'
+            }),
             'is_featured': forms.CheckboxInput(attrs={
                 'class': 'form-checkbox'
             })
@@ -43,8 +47,8 @@ class ProductForm(forms.ModelForm):
         return price
 
     def clean_image(self):
-            image = self.cleaned_data.get('image')
-            if image:
-                if image.size > 5 * 1024 * 1024:  # 5MB limit
-                    raise forms.ValidationError("Image file too large ( > 5MB )")
-            return image
+        image = self.cleaned_data.get('image')
+        if image and not isinstance(image, str):  # Check if image is a file and not a string
+            if image.size > 5 * 1024 * 1024:  # 5MB limit
+                raise forms.ValidationError("Image file too large ( > 5MB )")
+        return image

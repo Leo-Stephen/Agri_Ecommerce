@@ -10,6 +10,7 @@ urlpatterns = [
     path('farmer/', include('farmer_app.urls')),        # Farmer-related URLs
     path('products/', include('product_app.urls')),     # Product-related URLs
     path('customer/', include('customer_app.urls')),    # Customer-related URLs
+    path('product_app/', include('product_app.urls')),  # Add this line
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 

@@ -15,6 +15,8 @@ def add_product(request):
         if form.is_valid():
             product = form.save(commit=False)
             product.farmer = request.user
+            if 'image' in request.FILES:
+                product.image = request.FILES['image']
             product.save()
             messages.success(request, 'Product added successfully!')
             return redirect('my_products')
@@ -59,48 +61,36 @@ def sort_products(request):
 @login_required
 def edit_product(request, product_id):
     product = get_object_or_404(Product, id=product_id, farmer=request.user)
-
+    
     if request.method == 'POST':
         form = ProductForm(request.POST, request.FILES, instance=product)
         if form.is_valid():
+            if 'image' in request.FILES:
+                if product.image:
+                    try:
+                        product.image.delete(save=False)
+                    except:
+                        pass
             form.save()
             messages.success(request, 'Product updated successfully!')
-            # Get updated products and return the refreshed grid
-            products = Product.objects.filter(farmer=request.user).order_by('-created_at')
-            html = render_to_string('product_grid_partial.html', {
-                'products': products
-            }, request=request)
-            return JsonResponse({
-                'status': 'success',
-                'html': html
-            })
-        else:
-            return JsonResponse({'status': 'error', 'errors': form.errors})
-
-    form = ProductForm(instance=product)
-    html = render_to_string('edit_product_form.html', {
+            return redirect('my_products')
+    else:
+        form = ProductForm(instance=product)
+    
+    return render(request, 'edit_product_page.html', {
         'form': form,
         'product': product
-    }, request=request)
-    return HttpResponse(html)
+    })
 
 
 @login_required
 def delete_product(request, product_id):
-    product = get_object_or_404(Product, id=product_id, farmer=request.user)
     if request.method == 'POST':
+        product = get_object_or_404(Product, id=product_id, farmer=request.user)
         product.delete()
-        # Get updated products list
-        products = Product.objects.filter(farmer=request.user).order_by('-created_at')
-        html = render_to_string('product_grid_partial.html', {
-            'products': products
-        }, request=request)
-        return JsonResponse({
-            'status': 'success',
-            'html': html,
-            'message': 'Product deleted successfully!'
-        })
-    return JsonResponse({'status': 'error', 'message': 'Invalid request method'})
+        messages.success(request, 'Product deleted successfully!')
+        return redirect('my_products')
+    return redirect('my_products')
 
 
 @login_required

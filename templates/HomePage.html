@@ -83,106 +83,142 @@
             <div class="swiper-pagination"></div>
         </div>
     </div>
-
 <section class="featured-products">
     <h2>Featured Products</h2>
     <div class="product-grid">
+        <!-- Product 1 -->
         <div class="product-card">
             <div class="image-container">
                 <img src="{% static 'images/organic_tomato_seeds.jpg' %}" alt="Organic Tomato Seeds">
             </div>
             <h3>Organic Tomato Seeds</h3>
             <p class="price">₹150</p>
-            <button class="cta-btn">Add to Cart</button>
+            <button class="cta-btn" onclick="redirectToRegister()">Add to Cart</button>
         </div>
+
+        <!-- Product 2 -->
         <div class="product-card">
             <div class="image-container">
                 <img src="{% static 'images/organic_fertilizer.jpg' %}" alt="Organic All-Purpose Fertilizer">
             </div>
             <h3>Organic All-Purpose Fertilizer</h3>
             <p class="price">₹250</p>
-            <button class="cta-btn">Add to Cart</button>
+            <button class="cta-btn" onclick="redirectToRegister()">Add to Cart</button>
         </div>
+
+        <!-- Product 3 -->
         <div class="product-card">
             <div class="image-container">
                 <img src="{% static 'images/neem_oil_spray.jpg' %}" alt="Neem Oil Spray">
             </div>
             <h3>Neem Oil Spray</h3>
             <p class="price">₹200</p>
-            <button class="cta-btn">Add to Cart</button>
+            <button class="cta-btn" onclick="redirectToRegister()">Add to Cart</button>
         </div>
+
+        <!-- Product 4 -->
         <div class="product-card">
             <div class="image-container">
                 <img src="{% static 'images/hand_trowel.jpg' %}" alt="Hand Trowel">
             </div>
             <h3>Hand Trowel</h3>
             <p class="price">₹180</p>
-            <button class="cta-btn">Add to Cart</button>
+            <button class="cta-btn" onclick="redirectToRegister()">Add to Cart</button>
         </div>
+
+        <!-- Product 5 -->
         <div class="product-card">
             <div class="image-container">
                 <img src="{% static 'images/collapsible_basket.jpg' %}" alt="Collapsible Harvest Basket">
             </div>
             <h3>Collapsible Harvest Basket</h3>
             <p class="price">₹350</p>
-            <button class="cta-btn">Add to Cart</button>
+            <button class="cta-btn" onclick="redirectToRegister()">Add to Cart</button>
         </div>
+
+        <!-- Product 6 -->
         <div class="product-card">
             <div class="image-container">
                 <img src="{% static 'images/organic_chicken_feed.jpg' %}" alt="Organic Chicken Feed">
             </div>
             <h3>Organic Chicken Feed</h3>
             <p class="price">₹400</p>
-            <button class="cta-btn">Add to Cart</button>
+            <button class="cta-btn" onclick="redirectToRegister()">Add to Cart</button>
         </div>
+
+        <!-- Product 7 -->
         <div class="product-card">
             <div class="image-container">
                 <img src="{% static 'images/manual_seed_planter.jpg' %}" alt="Manual Seed Planter">
             </div>
             <h3>Manual Seed Planter</h3>
             <p class="price">₹300</p>
-            <button class="cta-btn">Add to Cart</button>
+            <button class="cta-btn" onclick="redirectToRegister()">Add to Cart</button>
         </div>
+
+        <!-- Product 8 -->
         <div class="product-card">
             <div class="image-container">
                 <img src="{% static 'images/biodegradable_pots.jpg' %}" alt="Biodegradable Seedling Pots">
             </div>
             <h3>Biodegradable Seedling Pots</h3>
             <p class="price">₹120</p>
-            <button class="cta-btn">Add to Cart</button>
+            <button class="cta-btn" onclick="redirectToRegister()">Add to Cart</button>
         </div>
     </div>
 </section>
 
+<script>
+    // Function to redirect to the registration page
+    function redirectToRegister() {
+        window.location.href = "{% url 'register' %}";
+    }
+</script>
+
 <section class="blog-highlights">
     <h2>From Our Blog</h2>
     <div class="blog-grid">
+        <!-- Blog Post 1 -->
         <div class="blog-card">
             <img src="{% static 'images/blog1.jpg' %}" alt="Blog Post 1">
             <h3>5 Tips for Healthy Eating</h3>
             <p>Discover how to incorporate more organic produce into your diet with these simple tips!</p>
-            <a href="#blog1" class="read-more">Read More</a>
+            <a href="#" class="read-more" onclick="redirectToRegister()">Read More</a>
         </div>
+
+        <!-- Blog Post 2 -->
         <div class="blog-card">
             <img src="{% static 'images/blog2.jpg' %}" alt="Blog Post 2">
             <h3>The Benefits of Organic Farming</h3>
             <p>Learn about the environmental and health benefits of choosing organic farming practices.</p>
-            <a href="#blog2" class="read-more">Read More</a>
+            <a href="#" class="read-more" onclick="redirectToRegister()">Read More</a>
         </div>
+
+        <!-- Blog Post 3 -->
         <div class="blog-card">
             <img src="{% static 'images/blog3.jpg' %}" alt="Blog Post 3">
             <h3>Sustainable Eating: A Beginner's Guide</h3>
             <p>Get started with sustainable eating by understanding its impact on the environment.</p>
-            <a href="#blog3" class="read-more">Read More</a>
+            <a href="#" class="read-more" onclick="redirectToRegister()">Read More</a>
         </div>
+
+        <!-- Blog Post 4 -->
         <div class="blog-card">
             <img src="{% static 'images/blog4.jpg' %}" alt="Blog Post 4">
             <h3>Seasonal Produce: What to Eat Now</h3>
             <p>Find out which fruits and vegetables are in season this month for the freshest options.</p>
-            <a href="#blog4" class="read-more">Read More</a>
+            <a href="#" class="read-more" onclick="redirectToRegister()">Read More</a>
         </div>
     </div>
 </section>
+
+<script>
+    // Function to redirect to the registration page
+    function redirectToRegister() {
+        window.location.href = "{% url 'register' %}";
+    }
+</script>
+
 
 <section class="customer-stories">
     <div class="container">

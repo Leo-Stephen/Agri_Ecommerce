@@ -133,7 +133,7 @@
                         {% for product in featured_products %}
                             <div class="product-card" data-product-id="{{ product.id }}">
                                 <div class="product-image">
-                                    <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                                    <img src="{{ product.get_image_url }}" alt="{{ product.name }}">
                                     {% csrf_token %}
                                 </div>
                                 <div class="product-details">

@@ -14,11 +14,6 @@
         {% include 'NavBar/FarmerNavBar.html' %}
     </header>
 
-    <!-- Add this right after the header section -->
-    <div id="loadingOverlay" class="loading-overlay">
-        <div class="spinner"></div>
-    </div>
-
     <section class="hero">
         <div class="hero-content">
             <h1>My Products</h1>
@@ -93,15 +88,12 @@
         {% csrf_token %}
     </main>
 
-    <!-- Edit Product Modal -->
-    <div id="editModal" class="modal">
-        <div class="modal-content">
-            <span class="close-modal">&times;</span>
-            <div id="editFormContainer"></div>
-        </div>
+{% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+            <div class="message {{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
     </div>
-
-{% block extra_js %}
-    <script src="{% static 'js/product.js' %}"></script>
-    <script src="https://unpkg.com/htmx.org@1.9.6"></script>
-{% endblock %}
+{% endif %}

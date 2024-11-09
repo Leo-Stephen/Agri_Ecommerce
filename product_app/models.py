@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
+from django.templatetags.static import static
 
 
 class Product(models.Model):
@@ -19,10 +20,15 @@ class Product(models.Model):
     description = models.TextField()
     image = models.ImageField(
         upload_to='products/',
-        default='images/productnotuploaded.jpg',
+        null=True,
         blank=True
     )
     farmer = models.ForeignKey(User, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     is_featured = models.BooleanField(default=False)
+
+    def get_image_url(self):
+        if self.image and hasattr(self.image, 'url'):
+            return self.image.url
+        return static('images/default_product.jpg')

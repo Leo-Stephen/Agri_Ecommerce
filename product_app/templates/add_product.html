@@ -40,16 +40,20 @@
                         {% if field.name == 'image' %}
                             <div class="form-group">
                                 <label for="{{ field.id_for_label }}" class="form-label">Product Image</label>
-                                <div class="image-upload-container" onclick="document.getElementById('id_image').click();">
+                                <div class="image-upload-container">
                                     <div class="image-preview" id="imagePreview">
-                                        <img src="#" alt="Preview" style="display: none;">
+                                        <img src="{% static 'images/default_product.jpg' %}" alt="Preview" id="previewImage">
                                         <div class="placeholder">
                                             <i class="fas fa-cloud-upload-alt"></i>
                                             <p>Click here or drag and drop</p>
                                             <span>Supported formats: JPG, PNG, GIF (max 5MB)</span>
                                         </div>
                                     </div>
-                                    {{ field }}
+                                    <input type="file" 
+                                           id="id_image" 
+                                           name="image" 
+                                           accept="image/*"
+                                           style="display: none;">
                                 </div>
                                 {% if field.errors %}
                                     <span class="error-message">{{ field.errors.0 }}</span>
@@ -98,22 +102,24 @@
     <script>
         const imageInput = document.getElementById('id_image');
         const imagePreview = document.getElementById('imagePreview');
-        const previewImg = imagePreview.querySelector('img');
+        const previewImage = document.getElementById('previewImage');
         const placeholder = imagePreview.querySelector('.placeholder');
+
+        // Make the preview div clickable to trigger file input
+        imagePreview.addEventListener('click', () => {
+            imageInput.click();
+        });
 
         imageInput.addEventListener('change', function() {
             const file = this.files[0];
             if (file) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    previewImg.src = e.target.result;
-                    previewImg.style.display = 'block';
+                    previewImage.src = e.target.result;
+                    previewImage.style.display = 'block';
                     placeholder.style.display = 'none';
                 }
                 reader.readAsDataURL(file);
-            } else {
-                previewImg.style.display = 'none';
-                placeholder.style.display = 'block';
             }
         });
 

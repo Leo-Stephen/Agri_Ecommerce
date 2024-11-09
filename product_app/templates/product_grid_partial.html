@@ -1,13 +1,8 @@
+{% load static %}
 {% for product in products %}
     <div class="product-card" data-category="{{ product.category }}">
         <div class="product-image">
-            {% if product.image %}
-                <img src="{{ product.image.url }}" alt="{{ product.name }}" loading="lazy">
-            {% else %}
-                <div class="no-image">
-                    <i class="fas fa-image"></i>
-                </div>
-            {% endif %}
+            <img src="{{ product.get_image_url }}" alt="{{ product.name }}" loading="lazy">
             {% if product.is_featured %}
                 <div class="featured-badge">Featured</div>
             {% endif %}
@@ -20,19 +15,21 @@
                 <span class="stock">Stock: {{ product.quantity }}</span>
             </div>
             <div class="product-actions">
-                <button class="edit-btn" onclick="openEditModal('{{ product.id }}')">
+                <a href="{% url 'edit_product' product.id %}" class="edit-btn">
                     <i class="fas fa-edit"></i> Edit
-                </button>
+                </a>
                 <form method="POST" action="{% url 'toggle_featured' product.id %}" class="d-inline">
                     {% csrf_token %}
-                    <button type="submit" class="featured-btn {% if product.is_featured %}active{% endif %}" 
-                            title="Toggle featured status">
+                    <button type="submit" class="featured-btn {% if product.is_featured %}active{% endif %}">
                         <i class="fas fa-star"></i>
                     </button>
                 </form>
-                <button class="delete-btn" onclick="confirmDelete('{{ product.id }}')">
-                    <i class="fas fa-trash"></i> Delete
-                </button>
+                <form method="POST" action="{% url 'delete_product' product.id %}" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this product?');">
+                    {% csrf_token %}
+                    <button type="submit" class="delete-btn">
+                        <i class="fas fa-trash"></i> Delete
+                    </button>
+                </form>
             </div>
         </div>
     </div>

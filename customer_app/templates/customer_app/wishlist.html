@@ -38,7 +38,7 @@
                 {% for item in wishlist_items %}
                     <div class="wishlist-card" data-product-id="{{ item.product.id }}">
                         <div class="wishlist-image">
-                            <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}">
+                            <img src="{{ item.product.get_image_url }}" alt="{{ item.product.name }}">
                         </div>
                         <div class="wishlist-content">
                             <h2>{{ item.product.name }}</h2>

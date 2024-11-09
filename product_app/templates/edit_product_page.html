@@ -1,0 +1,110 @@
+{% load static %}
+
+{% block extra_css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/farmerdesign.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/my_product.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+{% endblock %}
+
+{% block content %}
+    <header class="header">
+        <div class="logo">
+            <img src="{% static 'images/kisan_vishwa_logo.png' %}" alt="Kisan Vishwa Logo">
+        </div>
+        {% include 'NavBar/FarmerNavBar.html' %}
+    </header>
+
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Edit Product</h1>
+            <p>Update your product information</p>
+        </div>
+    </section>
+
+    <main class="main-content">
+        <section class="add-product-section">
+            <div class="form-container">
+                {% if messages %}
+                    <div class="messages">
+                        {% for message in messages %}
+                            <div class="message {{ message.tags }}">{{ message }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <form method="POST" enctype="multipart/form-data" class="product-form">
+                    {% csrf_token %}
+                    {% for field in form %}
+                        {% if field.name == 'image' %}
+                            <div class="form-group">
+                                <label for="{{ field.id_for_label }}" class="form-label">Product Image</label>
+                                <div class="image-upload-container">
+                                    <div class="image-preview" id="imagePreview">
+                                        <img src="{{ product.get_image_url }}" 
+                                             alt="Product image" 
+                                             id="previewImage"
+                                             style="max-width: 100%; height: auto;">
+                                        <div class="placeholder" style="display: none;">
+                                            <i class="fas fa-cloud-upload-alt"></i>
+                                            <p>Click to change image</p>
+                                        </div>
+                                    </div>
+                                    <input type="file" 
+                                           id="id_image" 
+                                           name="image" 
+                                           accept="image/*"
+                                           style="display: none;"
+                                           class="form-input">
+                                </div>
+                            </div>
+                        {% else %}
+                            <div class="form-group">
+                                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                                {{ field }}
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                        <a href="{% url 'my_products' %}" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </main>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const imagePreview = document.getElementById('imagePreview');
+    const previewImage = document.getElementById('previewImage');
+    const imageInput = document.getElementById('id_image');
+
+    imageInput.addEventListener('change', function() {
+        const file = this.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                previewImage.src = e.target.result;
+                previewImage.style.display = 'block';
+                imagePreview.style.display = 'none';
+            }
+            reader.readAsDataURL(file);
+        } else {
+            // If no new file is selected, show the current image
+            previewImage.src = currentImageUrl;
+            previewImage.style.display = 'block';
+            imagePreview.style.display = 'none';
+        }
+    });
+
+    // Add form submission handling with image validation
+    const form = document.querySelector('.product-form');
+    form.addEventListener('submit', function(e) {
+        const submitBtn = this.querySelector('button[type="submit"]');
+        submitBtn.classList.add('loading');
+        submitBtn.disabled = true;
+    });
+</script>
+{% endblock %} 

@@ -2,10 +2,17 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from product_app.models import Product
 from product_app.forms import ProductForm
+from django.templatetags.static import static
 
 @login_required
 def farmer_dashboard(request):
     products = Product.objects.filter(farmer=request.user)  # Get products for the logged-in farmer
+    
+    # Ensure all products have valid image URLs
+    for product in products:
+        if not product.image:
+            product.image = static('images/default_product.jpg')  # Use static instead of media
+    
     if request.method == 'POST':
         form = ProductForm(request.POST, request.FILES)  # Handle form submission
         if form.is_valid():

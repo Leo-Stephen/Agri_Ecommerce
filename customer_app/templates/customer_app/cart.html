@@ -36,8 +36,8 @@
                 <div class="cart-items">
                     {% for item in cart_items %}
                         <div class="cart-item">
-                            <div class="item-image">
-                                <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}">
+                            <div class="cart-item-image">
+                                <img src="{{ item.product.get_image_url }}" alt="{{ item.product.name }}">
                             </div>
                             <div class="item-details">
                                 <h2>{{ item.product.name }}</h2>
