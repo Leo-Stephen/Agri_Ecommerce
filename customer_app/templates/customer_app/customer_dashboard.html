@@ -203,7 +203,157 @@
             document.body.appendChild(toast);
             setTimeout(() => toast.remove(), 3000);
         }
+
+        // Debounce function to prevent multiple rapid clicks
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const addToCartButtons = document.querySelectorAll('.add-to-cart');
+            
+            // Keep track of pending requests
+            const pendingRequests = new Set();
+            
+            const handleAddToCart = async function(e) {
+                e.preventDefault();
+                const button = this;
+                const productId = button.getAttribute('data-product-id');
+                
+                // Prevent duplicate requests
+                if (pendingRequests.has(productId)) return;
+                
+                // Visual feedback
+                button.disabled = true;
+                button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...';
+                
+                pendingRequests.add(productId);
+                
+                try {
+                    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+                    const response = await fetch('/customer/add-to-cart/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': csrfToken,
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: JSON.stringify({
+                            product_id: productId,
+                            quantity: 1
+                        })
+                    });
+
+                    const data = await response.json();
+                    
+                    if (response.ok) {
+                        // Update cart count in the UI
+                        const cartCount = document.querySelector('.cart .stat-number');
+                        if (cartCount) {
+                            cartCount.textContent = data.cart_items_count;
+                        }
+                        showToast(data.message || 'Product added to cart');
+                        
+                        // Trigger a subtle animation
+                        button.classList.add('success');
+                        setTimeout(() => button.classList.remove('success'), 1000);
+                    } else {
+                        showToast(data.error || 'Error adding to cart');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    showToast('Error adding to cart');
+                } finally {
+                    // Reset button state
+                    button.disabled = false;
+                    button.innerHTML = '<i class="fas fa-cart-plus"></i> Add to Cart';
+                    pendingRequests.delete(productId);
+                }
+            };
+
+            // Add debounced click handler to each button
+            addToCartButtons.forEach(button => {
+                button.addEventListener('click', debounce(handleAddToCart, 300));
+            });
+        });
+
+        // Enhanced toast notification
+        function showToast(message) {
+            const existingToast = document.querySelector('.toast-notification');
+            if (existingToast) {
+                existingToast.remove();
+            }
+            
+            const toast = document.createElement('div');
+            toast.className = 'toast-notification';
+            toast.innerHTML = `
+                <div class="toast-content">
+                    <i class="fas fa-info-circle"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+            document.body.appendChild(toast);
+            
+            // Animate in
+            requestAnimationFrame(() => {
+                toast.classList.add('show');
+            });
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
     </script>
+
+    <style>
+        .add-to-cart {
+            transition: all 0.3s ease;
+        }
+        
+        .add-to-cart:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+        
+        .add-to-cart.success {
+            background-color: #4CAF50;
+            transform: scale(1.05);
+        }
+        
+        .toast-notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #333;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 4px;
+            opacity: 0;
+            transform: translateY(100%);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .toast-notification.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .toast-content {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+    </style>
 
     <!-- Add after body tag -->
     <a href="#main-content" class="skip-link">Skip to main content</a>

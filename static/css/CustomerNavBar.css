@@ -35,15 +35,16 @@
   margin: 0 auto;
   padding: 0 2rem;
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
   height: 100%;
+  gap: 2rem;
 }
 
 .brand {
   display: flex;
   align-items: center;
-  margin-right: auto;
+  flex-shrink: 0;
 }
 
 .logo {
@@ -51,7 +52,7 @@
   align-items: center;
   text-decoration: none;
   color: var(--text-primary);
-  padding-left: 1rem;
+  padding-left: 0;
 }
 
 .logo img {
@@ -69,8 +70,8 @@
 .main-nav {
   display: flex;
   align-items: center;
-  gap: 1.5rem;
   margin-left: auto;
+  gap: 1rem;
 }
 
 .nav-list {
@@ -83,13 +84,15 @@
 }
 
 .nav-item {
+  position: relative;
   display: flex;
   align-items: center;
-  padding: 0 1rem;
+  padding: 0.75rem 1rem;
   color: var(--text-primary);
   text-decoration: none;
   transition: color 0.3s;
   height: 100%;
+  gap: 8px;
 }
 
 .nav-item:hover {
@@ -107,10 +110,19 @@
 .badge {
   background-color: #4CAF50;
   color: white;
-  padding: 2px 6px;
-  border-radius: 50%;
-  font-size: 0.8rem;
-  margin-left: 5px;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  min-width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 6px;
+  box-shadow: 0 2px 4px rgba(76, 175, 80, 0.2);
+  position: relative;
+  top: -2px;
 }
 
 .user-menu {

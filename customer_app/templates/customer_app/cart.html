@@ -77,14 +77,16 @@
                                 <h2>{{ item.product.name }}</h2>
                                 <p class="item-price">₹{{ item.product.price|floatformat:2 }}</p>
                                 <div class="quantity-wrapper">
-                                    <form method="POST" action="{% url 'add_to_cart' item.product.id %}" class="quantity-form">
+                                    <form method="POST" action="{% url 'update_cart_quantity' item.id %}" class="quantity-form">
                                         {% csrf_token %}
                                         <div class="quantity-controls">
-                                            <button type="button" class="quantity-btn minus">-</button>
-                                            <input type="number" name="quantity" value="{{ item.quantity }}" min="1" max="99">
-                                            <button type="button" class="quantity-btn plus">+</button>
+                                            <button type="button" class="quantity-btn minus" data-item-id="{{ item.id }}">-</button>
+                                            <input type="number" name="quantity" value="{{ item.quantity }}" min="1" max="99" class="quantity-input">
+                                            <button type="button" class="quantity-btn plus" data-item-id="{{ item.id }}">+</button>
                                         </div>
-                                        <button type="submit" class="update-btn">Update</button>
+                                        <button type="submit" class="update-btn">
+                                            <i class="fas fa-sync-alt"></i> Update
+                                        </button>
                                     </form>
                                     <form method="POST" action="{% url 'remove_from_cart' item.id %}" class="remove-form">
                                         {% csrf_token %}
@@ -137,16 +139,74 @@
     </main>
 
     <script>
-        document.querySelectorAll('.quantity-btn').forEach(button => {
-            button.addEventListener('click', function() {
-                const input = this.parentElement.querySelector('input');
-                if (this.classList.contains('minus')) {
-                    input.value = Math.max(1, parseInt(input.value) - 1);
+    document.querySelectorAll('.quantity-form').forEach(form => {
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const submitButton = this.querySelector('.update-btn');
+            submitButton.disabled = true;
+            
+            try {
+                const formData = new FormData(this);
+                const response = await fetch(this.action, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: formData
+                });
+
+                const data = await response.json();
+                
+                if (response.ok && data.status === 'success') {
+                    // Update item subtotal
+                    const cartItem = this.closest('.cart-item');
+                    const itemTotal = parseFloat(data.item_total);
+                    const cartTotal = parseFloat(data.cart_total);
+                    
+                    cartItem.querySelector('.item-subtotal').textContent = `₹${itemTotal.toFixed(2)}`;
+                    
+                    // Update cart total
+                    document.querySelector('.cart-total').textContent = `Total: ₹${cartTotal.toFixed(2)}`;
+                    
+                    // Update cart count
+                    document.querySelector('.cart-summary span:first-child').textContent = `${data.cart_count} items`;
+                    
+                    // Update summary total
+                    document.querySelector('.summary-total span:last-child').textContent = `₹${cartTotal.toFixed(2)}`;
+                    
+                    // Update navbar cart count
+                    const cartBadge = document.querySelector('.cart-count');
+                    if (cartBadge) cartBadge.textContent = data.cart_count;
                 } else {
-                    input.value = Math.min(99, parseInt(input.value) + 1);
+                    throw new Error(data.message || 'Failed to update cart');
                 }
-            });
+            } catch (error) {
+                console.error('Error:', error);
+                alert(error.message);
+            } finally {
+                submitButton.disabled = false;
+            }
         });
+    });
+
+    // Quantity button handlers
+    document.querySelectorAll('.quantity-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const form = this.closest('form');
+            const input = form.querySelector('input[name="quantity"]');
+            const currentValue = parseInt(input.value) || 1;
+            
+            if (this.classList.contains('minus')) {
+                input.value = Math.max(1, currentValue - 1);
+            } else {
+                input.value = Math.min(99, currentValue + 1);
+            }
+            
+            // Trigger form submission
+            form.dispatchEvent(new Event('submit'));
+        });
+    });
     </script>
 </body>
 </html>

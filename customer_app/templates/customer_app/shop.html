@@ -253,6 +253,78 @@
 
         // Add event listener for clear filters button
         document.getElementById('clearFilters').addEventListener('click', clearFilters);
+
+        let searchTimeout;
+        const searchInput = document.getElementById('searchInput');
+        const suggestionsBox = document.getElementById('searchSuggestions');
+
+        searchInput.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            const query = this.value.trim();
+            
+            if (query.length < 2) {
+                suggestionsBox.style.display = 'none';
+                return;
+            }
+
+            searchTimeout = setTimeout(async () => {
+                try {
+                    const response = await fetch(`/customer/search-suggestions/?query=${encodeURIComponent(query)}`);
+                    const data = await response.json();
+                    
+                    if (data.suggestions.length > 0) {
+                        suggestionsBox.innerHTML = data.suggestions
+                            .map(item => `
+                                <div class="suggestion-item" data-id="${item.id}">
+                                    ${item.name}
+                                </div>
+                            `).join('');
+                        suggestionsBox.style.display = 'block';
+                    } else {
+                        suggestionsBox.style.display = 'none';
+                    }
+                } catch (error) {
+                    console.error('Error fetching suggestions:', error);
+                }
+            }, 300);
+        });
+
+        // Handle suggestion clicks
+        suggestionsBox.addEventListener('click', function(e) {
+            const suggestionItem = e.target.closest('.suggestion-item');
+            if (suggestionItem) {
+                searchInput.value = suggestionItem.textContent.trim();
+                suggestionsBox.style.display = 'none';
+                applyFilters(); // Trigger search with selected suggestion
+            }
+        });
+
+        // Close suggestions when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!searchInput.contains(e.target) && !suggestionsBox.contains(e.target)) {
+                suggestionsBox.style.display = 'none';
+            }
+        });
+
+        // Add this to your existing applyFilters function
+        function applyFilters() {
+            const searchQuery = document.getElementById('searchInput').value;
+            const category = document.getElementById('categoryFilter').value;
+            const minPrice = document.getElementById('minPrice').value;
+            const maxPrice = document.getElementById('maxPrice').value;
+            const sortBy = document.getElementById('sortFilter').value;
+
+            let url = window.location.pathname + '?';
+            const params = new URLSearchParams();
+
+            if (searchQuery) params.append('search', searchQuery);
+            if (category) params.append('category', category);
+            if (minPrice) params.append('min_price', minPrice);
+            if (maxPrice) params.append('max_price', maxPrice);
+            if (sortBy !== 'default') params.append('sort', sortBy);
+
+            window.location = url + params.toString();
+        }
     </script>
 </body>
 </html>

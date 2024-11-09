@@ -8,6 +8,7 @@ from django.http import JsonResponse
 from .forms import AddToCartForm, UpdateCartForm
 from django.core.paginator import Paginator
 import json
+from django.db.models import Q
 
 @login_required
 def customer_dashboard(request):
@@ -139,13 +140,37 @@ def calculate_total_savings(user):
 
 @login_required
 def update_cart_quantity(request, item_id):
-    cart_item = get_object_or_404(CartItem, id=item_id, user=request.user)
     if request.method == 'POST':
-        form = UpdateCartForm(request.POST, instance=cart_item)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Cart updated successfully')
-    return redirect('customer_cart')
+        cart_item = get_object_or_404(CartItem, id=item_id, user=request.user)
+        try:
+            quantity = int(request.POST.get('quantity', 1))
+            if quantity > 0 and quantity <= 99:
+                cart_item.quantity = quantity
+                cart_item.save()
+                
+                # Calculate new totals
+                cart_items = CartItem.objects.filter(user=request.user)
+                cart_total = sum(item.product.price * item.quantity for item in cart_items)
+                
+                return JsonResponse({
+                    'status': 'success',
+                    'message': 'Cart updated successfully',
+                    'item_total': float(cart_item.product.price * cart_item.quantity),
+                    'cart_total': float(cart_total),
+                    'cart_count': cart_items.count()
+                })
+            else:
+                raise ValueError('Invalid quantity')
+        except ValueError as e:
+            return JsonResponse({
+                'status': 'error',
+                'message': str(e)
+            }, status=400)
+            
+    return JsonResponse({
+        'status': 'error',
+        'message': 'Invalid request'
+    }, status=400)
 
 
 @login_required
@@ -180,10 +205,14 @@ def toggle_wishlist(request, product_id):
 def shop(request):
     products = Product.objects.all()
     
-    # Search filter
+    # Search filter with Q objects for better search
     search_query = request.GET.get('search')
     if search_query:
-        products = products.filter(name__icontains=search_query)
+        products = products.filter(
+            Q(name__icontains=search_query) |
+            Q(description__icontains=search_query) |
+            Q(category__icontains=search_query)
+        )
     
     categories = dict(Product.CATEGORY_CHOICES)
     
@@ -232,15 +261,22 @@ def shop(request):
 
 @login_required
 def search_suggestions(request):
-    query = request.GET.get('q', '')
+    query = request.GET.get('query', '').strip()
+    
     if len(query) < 2:
         return JsonResponse({'suggestions': []})
     
     suggestions = Product.objects.filter(
-        name__icontains=query
-    ).values('name', 'id')[:5]
+        Q(name__icontains=query) |
+        Q(description__icontains=query) |
+        Q(category__icontains=query)
+    ).values('id', 'name')[:5]  # Limit to 5 suggestions
     
-    return JsonResponse({'suggestions': list(suggestions)})
+    suggestions_list = list(suggestions)
+    
+    return JsonResponse({
+        'suggestions': suggestions_list
+    })
 
 
 @login_required
