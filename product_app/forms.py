@@ -2,6 +2,7 @@
 
 from django import forms
 from .models import Product
+import os
 
 class ProductForm(forms.ModelForm):
     class Meta:
@@ -48,7 +49,15 @@ class ProductForm(forms.ModelForm):
 
     def clean_image(self):
         image = self.cleaned_data.get('image')
-        if image and not isinstance(image, str):  # Check if image is a file and not a string
-            if image.size > 5 * 1024 * 1024:  # 5MB limit
-                raise forms.ValidationError("Image file too large ( > 5MB )")
+        if image:
+            # Check if it's a new file upload
+            if hasattr(image, 'size'):
+                if image.size > 5 * 1024 * 1024:  # 5MB limit
+                    raise forms.ValidationError("Image file too large ( > 5MB )")
+                
+                # Validate image format
+                valid_extensions = ['.jpg', '.jpeg', '.png', '.gif']
+                ext = os.path.splitext(image.name)[1].lower()
+                if ext not in valid_extensions:
+                    raise forms.ValidationError("Unsupported file format. Please use JPG, PNG or GIF")
         return image

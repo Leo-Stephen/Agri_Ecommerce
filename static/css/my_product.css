@@ -80,6 +80,7 @@
 .filter-options {
     display: flex;
     gap: 1rem;
+    align-items: center;
 }
 
 .filter-options select {
@@ -534,4 +535,180 @@
     font-weight: 500;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     z-index: 1;
+}
+
+.clear-image-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: rgba(220, 53, 69, 0.9);
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.2s ease;
+}
+
+.clear-image-btn:hover {
+    background-color: rgb(220, 53, 69);
+}
+
+.image-container {
+    position: relative;
+    margin-bottom: 1rem;
+}
+
+.current-image {
+    position: relative;
+    width: 100%;
+    max-width: 300px;
+    margin-bottom: 1rem;
+}
+
+.preview-image {
+    width: 100%;
+    height: auto;
+    border-radius: 5px;
+    object-fit: cover;
+}
+
+.image-container {
+    position: relative;
+    margin-bottom: 2rem;
+    border: 1px solid var(--border-color);
+    padding: 1rem;
+    border-radius: 8px;
+    background-color: var(--white);
+}
+
+.current-image {
+    position: relative;
+    width: 100%;
+    max-width: 300px;
+    margin: 0 auto 1rem;
+}
+
+.preview-image {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    object-fit: cover;
+}
+
+.image-actions {
+    display: flex;
+    justify-content: center;
+    margin-top: 1rem;
+}
+
+.clear-image-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background-color: var(--danger);
+    color: var(--white);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.clear-image-btn:hover {
+    background-color: var(--danger-hover);
+    transform: translateY(-1px);
+}
+
+.clear-image-btn i {
+    font-size: 0.9rem;
+}
+
+.help-text {
+    display: block;
+    text-align: center;
+    color: var(--gray-600);
+    margin-top: 0.5rem;
+}
+
+.clear-image-checkbox {
+    margin-top: 1rem;
+    text-align: center;
+}
+
+.form-check-input {
+    margin-right: 0.5rem;
+}
+
+.form-check-label {
+    color: var(--text-secondary);
+    cursor: pointer;
+}
+
+.image-actions {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 1rem;
+}
+
+.htmx-indicator {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(255, 255, 255, 0.9);
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: var(--shadow-md);
+    z-index: 1000;
+}
+
+.htmx-request .htmx-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.spinner {
+    font-size: 2rem;
+    color: var(--primary-color);
+}
+
+.clear-filters-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background-color: #f0f0f0;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    color: #666;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.clear-filters-btn:hover {
+    background-color: #e0e0e0;
+    color: #333;
+}
+
+.clear-filters-btn i {
+    font-size: 0.9rem;
+}
+
+.htmx-request .products-grid {
+    opacity: 0.6;
+    transition: opacity 0.3s ease;
+}
+
+.htmx-request .clear-filters-btn,
+.htmx-request select,
+.htmx-request input {
+    pointer-events: none;
+    opacity: 0.7;
 }

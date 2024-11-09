@@ -10,6 +10,11 @@ class Product(models.Model):
         ('fruits', 'Fruits'),
         ('grains', 'Grains'),
         ('dairy', 'Dairy'),
+        ('tools', 'Tools & Equipment'),
+        ('seeds', 'Seeds & Saplings'),
+        ('pesticides', 'Pesticides & Fertilizers'),
+        ('organic', 'Organic Products'),
+        ('livestock', 'Livestock & Feed'),
         ('other', 'Other')
     ]
 

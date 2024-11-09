@@ -6,6 +6,8 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, JsonResponse
 from django.template.loader import render_to_string
 from django.core.paginator import Paginator
+import os
+from django.db.models import Q
 
 
 @login_required
@@ -15,8 +17,7 @@ def add_product(request):
         if form.is_valid():
             product = form.save(commit=False)
             product.farmer = request.user
-            if 'image' in request.FILES:
-                product.image = request.FILES['image']
+            # If no image is uploaded, it will use the default image
             product.save()
             messages.success(request, 'Product added successfully!')
             return redirect('my_products')
@@ -29,18 +30,25 @@ def add_product(request):
 
 @login_required
 def my_products(request):
-    products = Product.objects.filter(farmer=request.user).order_by('-created_at')
-    return render(request, 'my_products.html', {'products': products})
-
-
-@login_required
-def sort_products(request):
+    # Get filter parameters
+    category = request.GET.get('category', '')
+    search_query = request.GET.get('search', '').strip()
     sort_by = request.GET.get('sort', 'newest')
 
-    # Get products for the current user
+    # Base queryset
     products = Product.objects.filter(farmer=request.user)
 
-    # Apply sorting based on selection
+    # Apply filters
+    if category:
+        products = products.filter(category=category)
+    
+    if search_query:
+        products = products.filter(
+            Q(name__icontains=search_query) |
+            Q(description__icontains=search_query)
+        )
+
+    # Apply sorting
     if sort_by == 'newest':
         products = products.order_by('-created_at')
     elif sort_by == 'oldest':
@@ -50,12 +58,20 @@ def sort_products(request):
     elif sort_by == 'price-low':
         products = products.order_by('price')
 
-    # Render only the products grid portion
-    html = render_to_string('product_grid_partial.html', {
-        'products': products
-    }, request=request)
+    # Pagination
+    paginator = Paginator(products, 12)
+    page = request.GET.get('page', 1)
+    products = paginator.get_page(page)
 
-    return HttpResponse(html)
+    context = {
+        'products': products,
+        'current_category': category,
+        'current_sort': sort_by,
+        'search_query': search_query,
+        'PRODUCT_CATEGORIES': Product.CATEGORY_CHOICES,
+    }
+    
+    return render(request, 'my_products.html', context)
 
 
 @login_required
@@ -65,12 +81,17 @@ def edit_product(request, product_id):
     if request.method == 'POST':
         form = ProductForm(request.POST, request.FILES, instance=product)
         if form.is_valid():
-            if 'image' in request.FILES:
+            # Check if clear_image is checked
+            if request.POST.get('clear_image'):
                 if product.image:
                     try:
-                        product.image.delete(save=False)
-                    except:
-                        pass
+                        old_image_path = product.image.path
+                        product.image = None
+                        if os.path.exists(old_image_path):
+                            os.remove(old_image_path)
+                    except Exception as e:
+                        print(f"Error removing image file: {e}")
+            
             form.save()
             messages.success(request, 'Product updated successfully!')
             return redirect('my_products')
@@ -109,3 +130,46 @@ def customer_dashboard(request):
         'featured_products': featured_products,
     }
     return render(request, 'customer_app/customer_dashboard.html', context)
+
+
+@login_required
+def clear_product_image(request, product_id):
+    if request.method == 'POST':
+        product = get_object_or_404(Product, id=product_id, farmer=request.user)
+        if product.image:
+            try:
+                old_image_path = product.image.path
+                product.image = None
+                product.save()
+                if os.path.exists(old_image_path):
+                    os.remove(old_image_path)
+                messages.success(request, 'Product image cleared successfully!')
+            except Exception as e:
+                print(f"Error removing image file: {e}")
+        
+        return redirect('edit_product', product_id=product_id)
+    return redirect('edit_product', product_id=product_id)
+
+
+@login_required
+def filter_products(request):
+    category = request.GET.get('category', '')
+    search_query = request.GET.get('search', '')
+    
+    products = Product.objects.filter(farmer=request.user)
+    
+    if category:
+        products = products.filter(category=category)
+    
+    if search_query:
+        products = products.filter(
+            Q(name__icontains=search_query) |
+            Q(description__icontains=search_query)
+        )
+    
+    html = render_to_string('product_grid_partial.html', {
+        'products': products,
+        'current_category': category
+    }, request=request)
+    
+    return HttpResponse(html)

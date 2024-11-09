@@ -1,4 +1,5 @@
 {% load static %}
+{% load custom_filters %}
 
 {% block extra_css %}
     <link rel="stylesheet" type="text/css" href="{% static 'css/farmerdesign.css' %}">
@@ -31,26 +32,29 @@
             <div class="search-filter">
                 <div class="search-box">
                     <i class="fas fa-search"></i>
-                    <input type="text" placeholder="Search products..." id="searchInput">
+                    <input type="text" 
+                           id="searchInput"
+                           placeholder="Search products..." 
+                           value="{{ search_query|default:'' }}">
                 </div>
                 <div class="filter-options">
-                    <select id="categoryFilter">
+                    <select id="categoryFilter" class="filter-select">
                         <option value="">All Categories</option>
-                        <option value="vegetables">Vegetables</option>
-                        <option value="fruits">Fruits</option>
-                        <option value="grains">Grains</option>
+                        {% for category_value, category_name in PRODUCT_CATEGORIES %}
+                            <option value="{{ category_value }}" {% if current_category == category_value %}selected{% endif %}>
+                                {{ category_name }}
+                            </option>
+                        {% endfor %}
                     </select>
-                    <select id="sortFilter"
-                            name="sort"
-                            hx-get="{% url 'sort_products' %}"
-                            hx-target="#productsGrid"
-                            hx-trigger="change"
-                            hx-indicator="#loadingOverlay">
-                        <option value="newest">Newest First</option>
-                        <option value="oldest">Oldest First</option>
-                        <option value="price-high">Price: High to Low</option>
-                        <option value="price-low">Price: Low to High</option>
+                    <select id="sortFilter" class="filter-select">
+                        <option value="newest" {% if current_sort == 'newest' %}selected{% endif %}>Newest First</option>
+                        <option value="oldest" {% if current_sort == 'oldest' %}selected{% endif %}>Oldest First</option>
+                        <option value="price-high" {% if current_sort == 'price-high' %}selected{% endif %}>Price: High to Low</option>
+                        <option value="price-low" {% if current_sort == 'price-low' %}selected{% endif %}>Price: Low to High</option>
                     </select>
+                    <button id="clearFilters" class="clear-filters-btn">
+                        <i class="fas fa-times"></i> Clear Filters
+                    </button>
                 </div>
             </div>
             <a href="{% url 'add_product' %}" class="add-product-btn">
@@ -62,30 +66,55 @@
             {% include 'product_grid_partial.html' with products=products %}
         </div>
 
-        {% if products.has_other_pages %}
-            <div class="pagination">
-                {% if products.has_previous %}
-                    <a href="?page={{ products.previous_page_number }}" class="page-link">
-                        <i class="fas fa-chevron-left"></i> Previous
-                    </a>
-                {% endif %}
+        <script>
+        let filterTimeout;
 
-                {% for num in products.paginator.page_range %}
-                    {% if products.number == num %}
-                        <span class="page-link active">{{ num }}</span>
-                    {% else %}
-                        <a href="?page={{ num }}" class="page-link">{{ num }}</a>
-                    {% endif %}
-                {% endfor %}
+        function applyFilters() {
+            clearTimeout(filterTimeout);
+            filterTimeout = setTimeout(() => {
+                const category = document.getElementById('categoryFilter').value;
+                const sort = document.getElementById('sortFilter').value;
+                const search = document.getElementById('searchInput').value;
 
-                {% if products.has_next %}
-                    <a href="?page={{ products.next_page_number }}" class="page-link">
-                        Next <i class="fas fa-chevron-right"></i>
-                    </a>
-                {% endif %}
-            </div>
-        {% endif %}
-        {% csrf_token %}
+                const url = new URL(window.location);
+                
+                // Handle category parameter
+                if (category) {
+                    url.searchParams.set('category', category);
+                } else {
+                    url.searchParams.delete('category');
+                }
+                
+                // Handle other parameters
+                if (sort && sort !== 'newest') {
+                    url.searchParams.set('sort', sort);
+                } else {
+                    url.searchParams.delete('sort');
+                }
+                
+                if (search) {
+                    url.searchParams.set('search', search);
+                } else {
+                    url.searchParams.delete('search');
+                }
+
+                window.location = url;
+            }, 500);
+        }
+
+        // Add event listeners
+        document.getElementById('categoryFilter').addEventListener('change', applyFilters);
+        document.getElementById('sortFilter').addEventListener('change', applyFilters);
+        document.getElementById('searchInput').addEventListener('input', applyFilters);
+
+        // Clear filters
+        document.getElementById('clearFilters').addEventListener('click', () => {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('categoryFilter').value = '';
+            document.getElementById('sortFilter').value = 'newest';
+            window.location = window.location.pathname;
+        });
+        </script>
     </main>
 
 {% if messages %}
@@ -97,3 +126,9 @@
         {% endfor %}
     </div>
 {% endif %}
+
+<div id="loadingOverlay" class="htmx-indicator">
+    <div class="spinner">
+        <i class="fas fa-spinner fa-spin"></i>
+    </div>
+</div>

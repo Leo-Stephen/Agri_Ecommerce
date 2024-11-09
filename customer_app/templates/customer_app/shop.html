@@ -1,4 +1,5 @@
 {% load static %}
+{% load custom_filters %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -39,9 +40,9 @@
                 
                 <select id="categoryFilter" class="filter-select">
                     <option value="">All Categories</option>
-                    {% for key, value in categories.items %}
-                        <option value="{{ key }}" {% if current_category == key %}selected{% endif %}>
-                            {{ value }}
+                    {% for category_value, category_name in PRODUCT_CATEGORIES %}
+                        <option value="{{ category_value }}" {% if current_category == category_value %}selected{% endif %}>
+                            <i class="fas {{ CATEGORY_ICONS|get_item:category_value }}"></i> {{ category_name }}
                         </option>
                     {% endfor %}
                 </select>

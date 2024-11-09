@@ -42,4 +42,41 @@
             <i class="fas fa-plus"></i> Add Your First Product
         </a>
     </div>
-{% endfor %} 
+{% endfor %}
+
+{% if products.has_other_pages %}
+    <div class="pagination">
+        {% if products.has_previous %}
+            <a href="?page={{ products.previous_page_number }}&search={{ search_query }}&category={{ current_category }}&sort={{ current_sort }}" 
+               hx-get="{% url 'my_products' %}?page={{ products.previous_page_number }}&search={{ search_query }}&category={{ current_category }}&sort={{ current_sort }}"
+               hx-target="#productsGrid"
+               hx-push-url="true">
+                <i class="fas fa-chevron-left"></i> Previous
+            </a>
+        {% endif %}
+
+        {% for num in products.paginator.page_range %}
+            {% if products.number == num %}
+                <span class="page-link active">{{ num }}</span>
+            {% else %}
+                <a href="?page={{ num }}&search={{ search_query }}&category={{ current_category }}&sort={{ current_sort }}" 
+                   class="page-link"
+                   hx-get="{% url 'my_products' %}?page={{ num }}&search={{ search_query }}&category={{ current_category }}&sort={{ current_sort }}"
+                   hx-target="#productsGrid"
+                   hx-push-url="true">
+                    {{ num }}
+                </a>
+            {% endif %}
+        {% endfor %}
+
+        {% if products.has_next %}
+            <a href="?page={{ products.next_page_number }}&search={{ search_query }}&category={{ current_category }}&sort={{ current_sort }}" 
+               class="page-link"
+               hx-get="{% url 'my_products' %}?page={{ products.next_page_number }}&search={{ search_query }}&category={{ current_category }}&sort={{ current_sort }}"
+               hx-target="#productsGrid"
+               hx-push-url="true">
+                Next <i class="fas fa-chevron-right"></i>
+            </a>
+        {% endif %}
+    </div>
+{% endif %} 

@@ -129,6 +129,36 @@
             submitBtn.classList.add('loading');
             submitBtn.disabled = true;
         });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const clearImageBtn = document.querySelector('.clear-image-btn');
+            if (clearImageBtn) {
+                clearImageBtn.addEventListener('click', async function() {
+                    if (confirm('Are you sure you want to clear this image?')) {
+                        const productId = this.dataset.productId;
+                        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+                        
+                        try {
+                            const response = await fetch(`/product_app/clear-product-image/${productId}/`, {
+                                method: 'POST',
+                                headers: {
+                                    'X-CSRFToken': csrfToken
+                                }
+                            });
+                            
+                            if (response.ok) {
+                                window.location.reload();
+                            } else {
+                                throw new Error('Failed to clear image');
+                            }
+                        } catch (error) {
+                            console.error('Error:', error);
+                            alert('Failed to clear image. Please try again.');
+                        }
+                    }
+                });
+            }
+        });
     </script>
     {% endblock %}
 {% endblock %}

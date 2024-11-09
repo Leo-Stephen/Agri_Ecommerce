@@ -1,4 +1,5 @@
 from .models import Wishlist, CartItem
+from product_app.models import Product
 
 def wishlist_and_cart_counts(request):
     if request.user.is_authenticated:
@@ -28,4 +29,26 @@ def wishlist_status(request):
     return {
         'wishlist_product_ids': set(),
         'wishlist_products': []
+    }
+
+def product_categories(request):
+    """
+    Provides product categories and their icons for consistent use across templates
+    """
+    CATEGORY_ICONS = {
+        'vegetables': 'fa-carrot',
+        'fruits': 'fa-apple-alt',
+        'grains': 'fa-wheat',
+        'dairy': 'fa-cheese',
+        'tools': 'fa-tools',
+        'seeds': 'fa-seedling',
+        'pesticides': 'fa-spray-can',
+        'organic': 'fa-leaf',
+        'livestock': 'fa-cow',
+        'other': 'fa-box'
+    }
+    
+    return {
+        'PRODUCT_CATEGORIES': Product.CATEGORY_CHOICES,
+        'CATEGORY_ICONS': CATEGORY_ICONS
     } 
