@@ -28,7 +28,7 @@
         <div class="shop-header">
             <h1>Shop Products</h1>
             <div class="filter-container">
-                <div class="search-bar">
+                <div class="shop-search-bar">
                     <i class="fas fa-search search-icon"></i>
                     <input type="text" 
                            id="searchInput" 
@@ -101,6 +101,30 @@
                 </div>
             </div>
             {% endfor %}
+        </div>
+
+        <div class="pagination">
+            {% if products.has_previous %}
+                <a href="?page=1{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.min_price %}&min_price={{ request.GET.min_price }}{% endif %}{% if request.GET.max_price %}&max_price={{ request.GET.max_price }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}" class="pagination-link">
+                    <i class="fas fa-angle-double-left"></i> First
+                </a>
+                <a href="?page={{ products.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.min_price %}&min_price={{ request.GET.min_price }}{% endif %}{% if request.GET.max_price %}&max_price={{ request.GET.max_price }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}" class="pagination-link">
+                    <i class="fas fa-angle-left"></i> Previous
+                </a>
+            {% endif %}
+
+            <span class="current-page">
+                Page {{ products.number }} of {{ products.paginator.num_pages }}
+            </span>
+
+            {% if products.has_next %}
+                <a href="?page={{ products.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.min_price %}&min_price={{ request.GET.min_price }}{% endif %}{% if request.GET.max_price %}&max_price={{ request.GET.max_price }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}" class="pagination-link">
+                    Next <i class="fas fa-angle-right"></i>
+                </a>
+                <a href="?page={{ products.paginator.num_pages }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.min_price %}&min_price={{ request.GET.min_price }}{% endif %}{% if request.GET.max_price %}&max_price={{ request.GET.max_price }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}" class="pagination-link">
+                    Last <i class="fas fa-angle-double-right"></i>
+                </a>
+            {% endif %}
         </div>
     </main>
 
@@ -214,7 +238,7 @@
                 showToast('Error adding to cart');
             } finally {
                 setTimeout(() => {
-                    button.disabled = false;
+                    button.disabled = thfalse;
                     button.innerHTML = '<i class="fas fa-cart-plus"></i> Add to Cart';
                     button.classList.remove('success');
                 }, 1000);
@@ -258,6 +282,13 @@
         const searchInput = document.getElementById('searchInput');
         const suggestionsBox = document.getElementById('searchSuggestions');
 
+        function updateSuggestionsPosition() {
+            const inputRect = searchInput.getBoundingClientRect();
+            suggestionsBox.style.top = `${inputRect.bottom + 5}px`;
+            suggestionsBox.style.left = `${inputRect.left}px`;
+            suggestionsBox.style.width = `${inputRect.width}px`;
+        }
+
         searchInput.addEventListener('input', function() {
             clearTimeout(searchTimeout);
             const query = this.value.trim();
@@ -272,7 +303,7 @@
                     const response = await fetch(`/customer/search-suggestions/?query=${encodeURIComponent(query)}`);
                     const data = await response.json();
                     
-                    if (data.suggestions.length > 0) {
+                    if (data.suggestions && data.suggestions.length > 0) {
                         suggestionsBox.innerHTML = data.suggestions
                             .map(item => `
                                 <div class="suggestion-item" data-id="${item.id}">
@@ -280,6 +311,7 @@
                                 </div>
                             `).join('');
                         suggestionsBox.style.display = 'block';
+                        updateSuggestionsPosition(); // Position the suggestions
                     } else {
                         suggestionsBox.style.display = 'none';
                     }
@@ -289,13 +321,63 @@
             }, 300);
         });
 
+        // Update position on scroll and resize
+        window.addEventListener('scroll', updateSuggestionsPosition);
+        window.addEventListener('resize', updateSuggestionsPosition);
+
         // Handle suggestion clicks
         suggestionsBox.addEventListener('click', function(e) {
             const suggestionItem = e.target.closest('.suggestion-item');
             if (suggestionItem) {
                 searchInput.value = suggestionItem.textContent.trim();
                 suggestionsBox.style.display = 'none';
-                applyFilters(); // Trigger search with selected suggestion
+                applyFilters(); // Trigger search with the selected suggestion
+            }
+        });
+
+        // Add enter key handler for search input
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                // If a suggestion is highlighted/selected, use that
+                const highlightedSuggestion = suggestionsBox.querySelector('.suggestion-item:hover');
+                if (highlightedSuggestion && suggestionsBox.style.display !== 'none') {
+                    searchInput.value = highlightedSuggestion.textContent.trim();
+                }
+                suggestionsBox.style.display = 'none';
+                applyFilters(); // Trigger search with current input value
+            }
+        });
+
+        // Optional: Add keyboard navigation for suggestions
+        searchInput.addEventListener('keydown', function(e) {
+            const suggestions = suggestionsBox.querySelectorAll('.suggestion-item');
+            const current = suggestionsBox.querySelector('.suggestion-item:hover');
+            
+            if (suggestions.length === 0) return;
+
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                if (!current) {
+                    suggestions[0].classList.add('hover');
+                } else {
+                    const next = [...suggestions].indexOf(current) + 1;
+                    if (next < suggestions.length) {
+                        current.classList.remove('hover');
+                        suggestions[next].classList.add('hover');
+                    }
+                }
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                if (!current) {
+                    suggestions[suggestions.length - 1].classList.add('hover');
+                } else {
+                    const prev = [...suggestions].indexOf(current) - 1;
+                    if (prev >= 0) {
+                        current.classList.remove('hover');
+                        suggestions[prev].classList.add('hover');
+                    }
+                }
             }
         });
 
