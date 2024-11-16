@@ -116,7 +116,9 @@
                         <div class="no-orders">
                             <i class="fas fa-box-open"></i>
                             <p>No recent orders</p>
-                            <a href="{% url 'customer_dashboard' %}" class="shop-now-btn">Shop Now</a>
+                            <a href="{% url 'shop' %}" class="shop-now-btn">
+                                <i class="fas fa-shopping-basket"></i> Shop Now
+                            </a>
                         </div>
                     {% endif %}
                 </div>
@@ -133,14 +135,16 @@
                         {% for product in featured_products %}
                             <div class="product-card" data-product-id="{{ product.id }}">
                                 <div class="product-image">
-                                    <img src="{{ product.get_image_url }}" alt="{{ product.name }}">
+                                    <img src="{{ product.get_image_url }}" alt="{{ product.name }}" loading="lazy">
                                     {% csrf_token %}
                                 </div>
                                 <div class="product-details">
                                     <h3>{{ product.name }}</h3>
                                     <p class="product-price">₹{{ product.price }}</p>
                                     <div class="product-actions">
-                                        <button class="add-to-cart" data-product-id="{{ product.id }}" aria-label="Add {{ product.name }} to cart">
+                                        <button class="add-to-cart" 
+                                                onclick="addToCart('{{ product.id }}', this)" 
+                                                data-product-id="{{ product.id }}">
                                             <i class="fas fa-cart-plus"></i> Add to Cart
                                         </button>
                                         <button class="add-to-wishlist" onclick="toggleWishlist('{{ product.id }}')" aria-label="Add to wishlist">
@@ -154,6 +158,26 @@
                         <p class="no-products">No featured products available</p>
                     {% endif %}
                 </div>
+
+                {% if featured_products.has_other_pages %}
+                <div class="pagination">
+                    {% if featured_products.has_previous %}
+                        <a href="?page={{ featured_products.previous_page_number }}" class="pagination-btn">&laquo; Previous</a>
+                    {% endif %}
+
+                    {% for num in featured_products.paginator.page_range %}
+                        {% if featured_products.number == num %}
+                            <span class="pagination-btn active">{{ num }}</span>
+                        {% else %}
+                            <a href="?page={{ num }}" class="pagination-btn">{{ num }}</a>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if featured_products.has_next %}
+                        <a href="?page={{ featured_products.next_page_number }}" class="pagination-btn">Next &raquo;</a>
+                    {% endif %}
+                </div>
+                {% endif %}
             </section>
         </div>
     </main>
@@ -180,7 +204,7 @@
                 
                 if (response.ok) {
                     const data = await response.json();
-                    const heartIcon = document.querySelector(`[data-product-id="${productId}"] .wishlist-btn i`);
+                    const heartIcon = document.querySelector(`[data-product-id="${productId}"] .add-to-wishlist i`);
                     if (heartIcon) {
                         heartIcon.classList.toggle('active');
                     }
@@ -239,17 +263,13 @@
                 
                 try {
                     const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-                    const response = await fetch('/customer/add-to-cart/', {
+                    const response = await fetch(`/customer/add-to-cart/${productId}/`, {
                         method: 'POST',
                         headers: {
-                            'Content-Type': 'application/json',
                             'X-CSRFToken': csrfToken,
+                            'Content-Type': 'application/json',
                             'X-Requested-With': 'XMLHttpRequest'
-                        },
-                        body: JSON.stringify({
-                            product_id: productId,
-                            quantity: 1
-                        })
+                        }
                     });
 
                     const data = await response.json();
@@ -258,7 +278,7 @@
                         // Update cart count in the UI
                         const cartCount = document.querySelector('.cart .stat-number');
                         if (cartCount) {
-                            cartCount.textContent = data.cart_items_count;
+                            cartCount.textContent = data.cart_count;
                         }
                         showToast(data.message || 'Product added to cart');
                         
@@ -266,7 +286,7 @@
                         button.classList.add('success');
                         setTimeout(() => button.classList.remove('success'), 1000);
                     } else {
-                        showToast(data.error || 'Error adding to cart');
+                        showToast(data.message || 'Error adding to cart');
                     }
                 } catch (error) {
                     console.error('Error:', error);
@@ -303,6 +323,73 @@
             document.body.appendChild(toast);
             
             // Animate in
+            requestAnimationFrame(() => {
+                toast.classList.add('show');
+            });
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Add to cart functionality
+        async function addToCart(productId, button) {
+            try {
+                button.disabled = true;
+                button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                
+                const response = await fetch(`/customer/add-to-cart/${productId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // Update cart count in stats
+                    const cartCount = document.querySelector('.cart .stat-number');
+                    if (cartCount) {
+                        cartCount.textContent = data.cart_count;
+                    }
+                    showToast(data.message || 'Product added to cart');
+                    button.classList.add('success');
+                } else {
+                    throw new Error(data.message);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('Error adding to cart');
+            } finally {
+                setTimeout(() => {
+                    button.disabled = false;
+                    button.innerHTML = '<i class="fas fa-cart-plus"></i> Add to Cart';
+                    button.classList.remove('success');
+                }, 1000);
+            }
+        }
+
+        // Enhanced toast notification
+        function showToast(message) {
+            const existingToast = document.querySelector('.toast-notification');
+            if (existingToast) {
+                existingToast.remove();
+            }
+            
+            const toast = document.createElement('div');
+            toast.className = 'toast-notification';
+            toast.innerHTML = `
+                <div class="toast-content">
+                    <i class="fas fa-info-circle"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+            document.body.appendChild(toast);
+            
             requestAnimationFrame(() => {
                 toast.classList.add('show');
             });

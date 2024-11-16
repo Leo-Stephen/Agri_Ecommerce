@@ -9,6 +9,7 @@ from .forms import AddToCartForm, UpdateCartForm
 from django.core.paginator import Paginator
 import json
 from django.db.models import Q
+from django.core.paginator import PageNotAnInteger, EmptyPage
 
 @login_required
 def customer_dashboard(request):
@@ -22,10 +23,21 @@ def customer_dashboard(request):
 
     # Add these new queries
     recent_orders = Order.objects.filter(user=request.user).order_by('-created_at')[:5]
-    featured_products = Product.objects.filter(is_deleted=False, is_featured=True)[:6]
+    featured_products = Product.objects.filter(is_deleted=False, is_featured=True)
     total_savings = calculate_total_savings(request.user)  # You'll need to implement this
     orders = Order.objects.filter(user=request.user)
 
+    # Add pagination
+    paginator = Paginator(featured_products, 15)  # Show 15 products per page (3 rows × 5 columns)
+    page = request.GET.get('page')
+    
+    try:
+        featured_products = paginator.get_page(page)
+    except PageNotAnInteger:
+        featured_products = paginator.get_page(1)
+    except EmptyPage:
+        featured_products = paginator.get_page(paginator.num_pages)
+    
     context = {
         'products': products,
         'cart_items_count': cart_items_count,
@@ -239,7 +251,7 @@ def shop(request):
         products = products.order_by('-created_at')
     
     # Pagination
-    paginator = Paginator(products, 12)  # Show 12 products per page
+    paginator = Paginator(products, 15)  # Show 15 products per page (3 rows × 5 columns)
     page = request.GET.get('page')
     products = paginator.get_page(page)
     
