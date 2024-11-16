@@ -118,6 +118,28 @@
                     previewImage.src = e.target.result;
                     previewImage.style.display = 'block';
                     placeholder.style.display = 'none';
+                    
+                    // Reset any previous styles
+                    previewImage.style.width = '';
+                    previewImage.style.height = '';
+                    
+                    // After image loads, check dimensions and adjust if needed
+                    previewImage.onload = function() {
+                        const containerWidth = imagePreview.offsetWidth;
+                        const containerHeight = imagePreview.offsetHeight;
+                        const imageRatio = this.naturalWidth / this.naturalHeight;
+                        const containerRatio = containerWidth / containerHeight;
+
+                        if (imageRatio > containerRatio) {
+                            // Image is wider than container
+                            this.style.width = '90%';
+                            this.style.height = 'auto';
+                        } else {
+                            // Image is taller than container
+                            this.style.height = '90%';
+                            this.style.width = 'auto';
+                        }
+                    }
                 }
                 reader.readAsDataURL(file);
             }

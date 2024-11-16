@@ -12,7 +12,7 @@ from django.db.models import Q
 
 @login_required
 def customer_dashboard(request):
-    products = Product.objects.all()  # Fetches all products
+    products = Product.objects.filter(is_deleted=False)
     # Cart and Wishlist Counts
     cart_items_count = CartItem.objects.filter(user=request.user).count()
     wishlist_count = Wishlist.objects.filter(user=request.user).count()
@@ -22,7 +22,7 @@ def customer_dashboard(request):
 
     # Add these new queries
     recent_orders = Order.objects.filter(user=request.user).order_by('-created_at')[:5]
-    featured_products = Product.objects.filter(is_featured=True)[:6]
+    featured_products = Product.objects.filter(is_deleted=False, is_featured=True)[:6]
     total_savings = calculate_total_savings(request.user)  # You'll need to implement this
     orders = Order.objects.filter(user=request.user)
 
@@ -203,7 +203,7 @@ def toggle_wishlist(request, product_id):
 
 @login_required
 def shop(request):
-    products = Product.objects.all()
+    products = Product.objects.filter(is_deleted=False)
     
     # Search filter with Q objects for better search
     search_query = request.GET.get('search')

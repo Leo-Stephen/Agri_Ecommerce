@@ -6,7 +6,7 @@ from django.templatetags.static import static
 
 @login_required
 def farmer_dashboard(request):
-    products = Product.objects.filter(farmer=request.user)  # Get products for the logged-in farmer
+    products = Product.objects.filter(farmer=request.user, is_deleted=False)  # Get products for the logged-in farmer
     
     # Ensure all products have valid image URLs
     for product in products:

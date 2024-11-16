@@ -32,8 +32,20 @@ class Product(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     is_featured = models.BooleanField(default=False)
+    is_deleted = models.BooleanField(default=False)
 
     def get_image_url(self):
         if self.image and hasattr(self.image, 'url'):
             return self.image.url
         return static('images/default_product.jpg')
+
+    def soft_delete(self):
+        self.is_deleted = True
+        self.save()
+
+    def is_active(self):
+        return not self.is_deleted
+
+    @property
+    def status(self):
+        return 'Inactive' if self.is_deleted else 'Active'

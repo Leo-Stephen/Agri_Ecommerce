@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from .forms import ProductForm
 from .models import Product
+from customer_app.models import CartItem, Wishlist
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, JsonResponse
 from django.template.loader import render_to_string
@@ -36,7 +37,7 @@ def my_products(request):
     sort_by = request.GET.get('sort', 'newest')
 
     # Base queryset
-    products = Product.objects.filter(farmer=request.user)
+    products = Product.objects.filter(farmer=request.user, is_deleted=False)
 
     # Apply filters
     if category:
@@ -107,10 +108,39 @@ def edit_product(request, product_id):
 @login_required
 def delete_product(request, product_id):
     if request.method == 'POST':
-        product = get_object_or_404(Product, id=product_id, farmer=request.user)
-        product.delete()
-        messages.success(request, 'Product deleted successfully!')
-        return redirect('my_products')
+        try:
+            product = get_object_or_404(Product, id=product_id, farmer=request.user)
+            
+            # First, delete related cart items
+            CartItem.objects.filter(product=product).delete()
+            
+            # Delete related wishlist items
+            Wishlist.objects.filter(product=product).delete()
+            
+            # Soft delete the product
+            product.is_deleted = True
+            product.save()
+            
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({
+                    'status': 'success',
+                    'message': 'Product deleted successfully',
+                    'remaining_count': Product.objects.filter(farmer=request.user, is_deleted=False).count()
+                })
+            
+            messages.success(request, 'Product deleted successfully!')
+            return redirect('my_products')
+            
+        except Exception as e:
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({
+                    'status': 'error',
+                    'message': str(e)
+                }, status=400)
+            
+            messages.error(request, f'Error deleting product: {str(e)}')
+            return redirect('my_products')
+    
     return redirect('my_products')
 
 

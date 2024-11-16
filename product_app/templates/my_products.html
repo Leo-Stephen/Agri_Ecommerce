@@ -132,3 +132,60 @@
         <i class="fas fa-spinner fa-spin"></i>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle delete form submissions
+    document.querySelectorAll('.delete-form').forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const productCard = this.closest('.product-card');
+            const productName = productCard.querySelector('.product-title').textContent;
+            
+            if (confirm(`Are you sure you want to delete "${productName}"?`)) {
+                // Show loading state
+                const deleteBtn = this.querySelector('.delete-btn');
+                deleteBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Deleting...';
+                deleteBtn.disabled = true;
+                
+                // Submit the form
+                fetch(this.action, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': this.querySelector('[name=csrfmiddlewaretoken]').value
+                    }
+                })
+                .then(response => {
+                    if (response.ok) {
+                        // Animate the card removal
+                        productCard.style.animation = 'fadeOut 0.3s ease';
+                        setTimeout(() => {
+                            productCard.remove();
+                            // Check if there are no products left
+                            if (document.querySelectorAll('.product-card').length === 0) {
+                                location.reload(); // Reload to show the "No Products" message
+                            }
+                        }, 300);
+                    } else {
+                        throw new Error('Failed to delete product');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    deleteBtn.innerHTML = '<i class="fas fa-trash"></i> Delete';
+                    deleteBtn.disabled = false;
+                    alert('Failed to delete product. Please try again.');
+                });
+            }
+        });
+    });
+});
+</script>
+
+<style>
+@keyframes fadeOut {
+    from { opacity: 1; transform: scale(1); }
+    to { opacity: 0; transform: scale(0.9); }
+}
+</style>
