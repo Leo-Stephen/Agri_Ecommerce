@@ -233,13 +233,20 @@ def shop(request):
     if category and category != 'all':
         products = products.filter(category=category)
     
-    # Filter by price range
+    # Update price range filtering
     min_price = request.GET.get('min_price')
     max_price = request.GET.get('max_price')
-    if min_price:
-        products = products.filter(price__gte=min_price)
-    if max_price:
-        products = products.filter(price__lte=max_price)
+    
+    try:
+        if min_price and min_price.strip():
+            min_price = float(min_price)
+            products = products.filter(price__gte=min_price)
+        if max_price and max_price.strip():
+            max_price = float(max_price)
+            products = products.filter(price__lte=max_price)
+    except ValueError:
+        # Handle invalid price inputs gracefully
+        messages.error(request, 'Invalid price range entered')
     
     # Sorting
     sort_by = request.GET.get('sort', 'default')

@@ -28,53 +28,59 @@
         <div class="shop-header">
             <h1>Shop Products</h1>
             <div class="filter-container">
-                <div class="shop-search-bar">
-                    <i class="fas fa-search search-icon"></i>
-                    <input type="text" 
-                           id="searchInput" 
-                           placeholder="Search products..." 
-                           value="{{ search_query|default:'' }}"
-                           autocomplete="off">
-                    <div id="searchSuggestions" class="search-suggestions"></div>
+                <div class="filter-group-left">
+                    <div class="shop-search-bar">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" 
+                               id="searchInput" 
+                               placeholder="Search products..." 
+                               value="{{ search_query|default:'' }}"
+                               autocomplete="off">
+                        <div id="searchSuggestions" class="search-suggestions"></div>
+                    </div>
+                    
+                    <select id="categoryFilter" class="filter-select">
+                        <option value="">All Categories</option>
+                        {% for category_value, category_name in PRODUCT_CATEGORIES %}
+                            <option value="{{ category_value }}" {% if current_category == category_value %}selected{% endif %}>
+                                <i class="fas {{ CATEGORY_ICONS|get_item:category_value }}"></i> {{ category_name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    
+                    <select id="sortFilter" class="filter-select">
+                        <option value="default">Sort By</option>
+                        <option value="price_low">Price: Low to High</option>
+                        <option value="price_high">Price: High to Low</option>
+                        <option value="newest">Newest First</option>
+                    </select>
                 </div>
-                
-                <select id="categoryFilter" class="filter-select">
-                    <option value="">All Categories</option>
-                    {% for category_value, category_name in PRODUCT_CATEGORIES %}
-                        <option value="{{ category_value }}" {% if current_category == category_value %}selected{% endif %}>
-                            <i class="fas {{ CATEGORY_ICONS|get_item:category_value }}"></i> {{ category_name }}
-                        </option>
-                    {% endfor %}
-                </select>
-                
-                <div class="price-range">
-                    <input type="number" 
-                           id="minPrice" 
-                           placeholder="Min Price" 
-                           value="{{ min_price|default:'' }}"
-                           step="10"
-                           min="0"
-                           class="price-input">
-                    <span>-</span>
-                    <input type="number" 
-                           id="maxPrice" 
-                           placeholder="Max Price" 
-                           value="{{ max_price|default:'' }}"
-                           step="10"
-                           min="0"
-                           class="price-input">
-                </div>
-                
-                <select id="sortFilter" class="filter-select">
-                    <option value="default">Sort By</option>
-                    <option value="price_low">Price: Low to High</option>
-                    <option value="price_high">Price: High to Low</option>
-                    <option value="newest">Newest First</option>
-                </select>
 
-                <button id="clearFilters" class="clear-filters-btn">
-                    <i class="fas fa-times"></i> Clear
-                </button>
+                <div class="filter-group-right">
+                    <div class="price-range">
+                        <input type="number" 
+                               id="minPrice" 
+                               placeholder="Min Price" 
+                               value="{{ min_price|default:'' }}"
+                               step="1"
+                               min="0"
+                               oninput="validatePrice(this)"
+                               class="price-input">
+                        <span>-</span>
+                        <input type="number" 
+                               id="maxPrice" 
+                               placeholder="Max Price" 
+                               value="{{ max_price|default:'' }}"
+                               step="1"
+                               min="0"
+                               oninput="validatePrice(this)"
+                               class="price-input">
+                    </div>
+
+                    <button id="clearFilters" class="clear-filters-btn">
+                        <i class="fas fa-times"></i> Clear
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -134,18 +140,27 @@
         function applyFilters() {
             clearTimeout(filterTimeout);
             filterTimeout = setTimeout(() => {
+                const searchQuery = document.getElementById('searchInput').value;
                 const category = document.getElementById('categoryFilter').value;
                 const minPrice = document.getElementById('minPrice').value;
                 const maxPrice = document.getElementById('maxPrice').value;
-                const sort = document.getElementById('sortFilter').value;
-                const search = document.getElementById('searchInput').value;
+                const sortBy = document.getElementById('sortFilter').value;
 
                 const url = new URL(window.location);
-                url.searchParams.set('category', category);
+                
+                // Clear existing parameters
+                url.searchParams.delete('search');
+                url.searchParams.delete('category');
+                url.searchParams.delete('min_price');
+                url.searchParams.delete('max_price');
+                url.searchParams.delete('sort');
+                
+                // Add new parameters only if they have values
+                if (searchQuery) url.searchParams.set('search', searchQuery);
+                if (category) url.searchParams.set('category', category);
                 if (minPrice) url.searchParams.set('min_price', minPrice);
                 if (maxPrice) url.searchParams.set('max_price', maxPrice);
-                url.searchParams.set('sort', sort);
-                if (search) url.searchParams.set('search', search);
+                if (sortBy !== 'default') url.searchParams.set('sort', sortBy);
 
                 window.location = url;
             }, 500);
@@ -154,8 +169,8 @@
         // Add event listeners
         document.getElementById('categoryFilter').addEventListener('change', applyFilters);
         document.getElementById('sortFilter').addEventListener('change', applyFilters);
-        document.getElementById('minPrice').addEventListener('input', applyFilters);
-        document.getElementById('maxPrice').addEventListener('input', applyFilters);
+        document.getElementById('minPrice').addEventListener('change', applyFilters);
+        document.getElementById('maxPrice').addEventListener('change', applyFilters);
 
         // Search with auto-suggestions
         document.getElementById('searchInput').addEventListener('input', async (e) => {
@@ -388,25 +403,28 @@
             }
         });
 
-        // Add this to your existing applyFilters function
-        function applyFilters() {
-            const searchQuery = document.getElementById('searchInput').value;
-            const category = document.getElementById('categoryFilter').value;
-            const minPrice = document.getElementById('minPrice').value;
-            const maxPrice = document.getElementById('maxPrice').value;
-            const sortBy = document.getElementById('sortFilter').value;
-
-            let url = window.location.pathname + '?';
-            const params = new URLSearchParams();
-
-            if (searchQuery) params.append('search', searchQuery);
-            if (category) params.append('category', category);
-            if (minPrice) params.append('min_price', minPrice);
-            if (maxPrice) params.append('max_price', maxPrice);
-            if (sortBy !== 'default') params.append('sort', sortBy);
-
-            window.location = url + params.toString();
+        // Add these functions to your existing script
+        function validatePrice(input) {
+            // Remove any non-numeric characters
+            input.value = input.value.replace(/[^0-9]/g, '');
+            
+            const minPrice = document.getElementById('minPrice');
+            const maxPrice = document.getElementById('maxPrice');
+            
+            if (minPrice.value && maxPrice.value) {
+                if (parseInt(minPrice.value) > parseInt(maxPrice.value)) {
+                    if (input.id === 'minPrice') {
+                        input.value = maxPrice.value;
+                    } else {
+                        input.value = minPrice.value;
+                    }
+                }
+            }
         }
+
+        // Add event listeners for price inputs
+        document.getElementById('minPrice').addEventListener('change', applyFilters);
+        document.getElementById('maxPrice').addEventListener('change', applyFilters);
     </script>
 </body>
 </html>
