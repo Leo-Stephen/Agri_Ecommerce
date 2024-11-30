@@ -20,9 +20,41 @@ class ChatMessage(models.Model):
     message_type = models.CharField(max_length=20, choices=MESSAGE_TYPES, default='general')
     is_user = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    attachment = models.FileField(
+        upload_to='chat_attachments/%Y/%m/%d/',
+        null=True,
+        blank=True,
+        help_text="File attachment for the message"
+    )
+    image_url = models.URLField(
+        null=True,
+        blank=True,
+        help_text="URL for image content"
+    )
+    link_preview = models.JSONField(
+        null=True,
+        blank=True,
+        help_text="Preview data for shared links"
+    )
     
     class Meta:
         ordering = ['-created_at']
     
     def __str__(self):
         return f"Chat with {self.user.username} at {self.created_at}" 
+
+class APIUsage(models.Model):
+    """Track API usage and costs"""
+    timestamp = models.DateTimeField(auto_now_add=True)
+    endpoint = models.CharField(max_length=100)
+    tokens_used = models.IntegerField()
+    cost = models.DecimalField(max_digits=10, decimal_places=6)
+    success = models.BooleanField(default=True)
+    error_message = models.TextField(null=True, blank=True)
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    
+    class Meta:
+        ordering = ['-timestamp']
+    
+    def __str__(self):
+        return f"API call at {self.timestamp} - Cost: ${self.cost}" 

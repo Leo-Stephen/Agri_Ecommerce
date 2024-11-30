@@ -27,24 +27,34 @@
                         hx-swap="innerHTML">×</button>
             </div>
             
-            <div class="kv-chat-messages">
-                {% for message in messages %}
-                    <div class="kv-message {% if message.is_user %}kv-user-message{% else %}kv-bot-message{% endif %}">
-                        <p class="kv-message-text">{{ message.message }}</p>
-                        <small class="kv-message-time">{{ message.created_at|time:"g:i A" }}</small>
-                    </div>
-                {% endfor %}
+            <div class="kv-chat-messages" 
+                 hx-get="{% url 'chatbot_app:get_messages' %}" 
+                 hx-trigger="load">
+                {% include "chatbot_app/messages.html" %}
             </div>
             
             <form class="kv-chat-input" 
                   hx-post="{% url 'chatbot_app:send_message' %}"
                   hx-target=".kv-chat-messages"
-                  hx-swap="beforeend">
+                  hx-swap="innerHTML"
+                  hx-encoding="multipart/form-data"
+                  hx-on::after-request="this.querySelector('input[name=message]').value = ''"
+                  hx-trigger="submit">
                 {% csrf_token %}
-                <input type="text" name="message" placeholder="Type your message..." required>
-                <button type="submit">
-                    <i class="fas fa-paper-plane"></i>
-                </button>
+                <div class="kv-input-wrapper">
+                    <input type="text" 
+                           name="message" 
+                           placeholder="Type your message..." 
+                           required
+                           id="chat-message-input">
+                    <label class="kv-attachment-button">
+                        <i class="fas fa-paperclip"></i>
+                        <input type="file" name="attachment" accept="image/*,.pdf,.doc,.docx" hidden>
+                    </label>
+                    <button type="submit">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
             </form>
         {% endif %}
     </div>
@@ -52,28 +62,37 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('Chat widget loaded');
-    
+    const form = document.querySelector('.kv-chat-input');
+    const input = document.querySelector('#chat-message-input');
+
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            input.value = '';
+        });
+    }
+
     htmx.on('htmx:afterRequest', function(evt) {
-        console.log('HTMX Request completed:', evt.detail);
         const container = document.querySelector('#kv-chat-container');
-        if (container.innerHTML.trim() !== '') {
+        if (container && container.innerHTML.trim() !== '') {
             container.classList.add('visible');
-            console.log('Chat container made visible');
-            
-            // Scroll to bottom of messages
             const messagesDiv = container.querySelector('.kv-chat-messages');
             if (messagesDiv) {
                 messagesDiv.scrollTop = messagesDiv.scrollHeight;
             }
-        } else {
+        } else if (container) {
             container.classList.remove('visible');
-            console.log('Chat container hidden');
         }
     });
-    
-    htmx.on('htmx:error', function(evt) {
-        console.error('HTMX Error:', evt.detail);
+
+    // Handle file input change
+    document.addEventListener('change', function(e) {
+        if (e.target.matches('input[type="file"]')) {
+            const fileName = e.target.files[0]?.name;
+            if (fileName) {
+                const messageInput = e.target.closest('form').querySelector('input[name="message"]');
+                messageInput.value = messageInput.value || `Attached: ${fileName}`;
+            }
+        }
     });
 });
-</script> 
+</script>

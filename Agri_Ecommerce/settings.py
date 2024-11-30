@@ -61,6 +61,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'chatbot_app.middleware.ChatRateLimitMiddleware',
+    'chatbot_app.middleware.APITrackingMiddleware',
 ]
 
 ROOT_URLCONF = 'Agri_Ecommerce.urls'
@@ -127,7 +128,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # Internationalization
 LANGUAGE_CODE = 'en-us'
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Kolkata'
 USE_I18N = True
 USE_TZ = True
 

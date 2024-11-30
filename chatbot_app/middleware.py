@@ -2,6 +2,7 @@ from django.core.cache import cache
 from django.http import HttpResponse
 import time
 import logging
+from .ai_service import GeminiService
 
 logger = logging.getLogger(__name__)
 
@@ -51,3 +52,20 @@ class ChatDebugMiddleware:
             logger.debug(f'Response status: {response.status_code}')
         
         return response
+
+class APITrackingMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+        
+    def __call__(self, request):
+        if hasattr(request, 'user') and request.user.is_authenticated:
+            # Store user in thread-local storage
+            setattr(GeminiService._thread_local, 'current_user', request.user)
+        
+        try:
+            response = self.get_response(request)
+            return response
+        finally:
+            # Always clean up thread-local storage
+            if hasattr(GeminiService._thread_local, 'current_user'):
+                delattr(GeminiService._thread_local, 'current_user')
