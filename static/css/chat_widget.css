@@ -1,0 +1,161 @@
+.kv-chat-widget {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
+    font-size: 16px;
+    font-family: 'Poppins', sans-serif;
+}
+
+.kv-chat-container {
+    display: none;
+    width: 300px;
+    height: 400px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    margin-bottom: 10px;
+    overflow: hidden;
+}
+
+.kv-chat-container.visible {
+    display: flex !important;
+    flex-direction: column;
+}
+
+.kv-chat-toggle {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: #4CAF50;
+    border: none;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1001;
+    font-size: 24px;
+}
+
+.kv-chat-header {
+    padding: 15px;
+    background: #4CAF50;
+    color: white;
+    border-radius: 10px 10px 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1.1em;
+}
+
+.kv-chat-messages {
+    flex-grow: 1;
+    padding: 15px;
+    overflow-y: auto;
+    font-size: 1em;
+}
+
+.kv-chat-input {
+    padding: 15px;
+    border-top: 1px solid #eee;
+    display: flex;
+    gap: 10px;
+}
+
+.kv-chat-input input {
+    flex-grow: 1;
+    padding: 8px 15px;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    font-size: 1em;
+    font-family: inherit;
+}
+
+.kv-chat-input button {
+    padding: 8px 15px;
+    background: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 1em;
+}
+
+.kv-message {
+    margin-bottom: 10px;
+    max-width: 80%;
+    font-size: 1em;
+}
+
+.kv-message p {
+    margin: 0;
+    line-height: 1.4;
+    font-size: 1em;
+}
+
+.kv-message small {
+    display: block;
+    font-size: 0.8em;
+    color: #666;
+    margin-top: 4px;
+}
+
+.kv-user-message {
+    margin-left: auto;
+    background: #E3F2FD;
+    padding: 10px;
+    border-radius: 10px 10px 0 10px;
+}
+
+.kv-bot-message {
+    background: #F5F5F5;
+    padding: 10px;
+    border-radius: 10px 10px 10px 0;
+}
+
+/* Reset any inherited styles */
+.kv-chat-widget * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+/* Ensure consistent icon sizes */
+.kv-chat-widget i.fas {
+    font-size: 24px;
+}
+
+.kv-chat-input button i.fas {
+    font-size: 16px;
+}
+
+/* Add JavaScript to toggle the 'visible' class */
+
+.kv-chat-loading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1002;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.kv-loading-spinner {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #4CAF50;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* HTMX will automatically show this when a request is in progress */

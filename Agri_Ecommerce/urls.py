@@ -11,6 +11,7 @@ urlpatterns = [
     path('products/', include('product_app.urls')),     # Product-related URLs
     path('customer/', include('customer_app.urls')),    # Customer-related URLs
     path('product_app/', include('product_app.urls')),  # Add this line
+    path('chatbot/', include('chatbot_app.urls', namespace='chatbot_app')),
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 

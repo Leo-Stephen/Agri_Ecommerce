@@ -11,6 +11,11 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
+import os
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -55,6 +60,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'chatbot_app.middleware.ChatRateLimitMiddleware',
 ]
 
 ROOT_URLCONF = 'Agri_Ecommerce.urls'
@@ -143,3 +149,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 RAZORPAY_KEY_ID = 'rzp_test_rt5J95NBZHv5at'
 RAZORPAY_KEY_SECRET = 'D6PPpadcpj8NLppy5cidzHBf'
+
+# Gemini AI Settings
+GEMINI_API_KEY = 'AIzaSyDdZAbaZo9hcWDBRl4KOJ3COBlautgjmQs'  # For development only
+# For production, use:
+# GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY')

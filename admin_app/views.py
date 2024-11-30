@@ -71,3 +71,77 @@ def order_list(request):
         'cart_items': cart_items,
     }
     return render(request, 'admin_app/order_list.html', context)
+
+def get_farmer_response(message):
+    """
+    Enhanced response system for farmer queries
+    """
+    message = message.lower()
+    
+    # Product Management Responses
+    if any(word in message for word in ['add product', 'sell', 'list']):
+        return {
+            'text': "To add a new product:\n1. Go to 'My Products'\n2. Click 'Add New Product'\n3. Fill in details\n4. Upload photos\n5. Set price and stock",
+            'links': ['/farmer/products/add/'],
+            'type': 'product_management'
+        }
+    
+    # Pricing Queries
+    elif any(word in message for word in ['price', 'pricing', 'cost']):
+        return {
+            'text': "Current market trends suggest:\n- Organic products: 20-30% premium\n- Seasonal items: Check local market rates\n- Bulk discounts: Consider for large orders",
+            'links': ['/market-trends/'],
+            'type': 'pricing'
+        }
+    
+    # Weather Related
+    elif any(word in message for word in ['weather', 'rain', 'forecast']):
+        return {
+            'text': "I can help you check weather forecasts for better crop planning. Please specify your location.",
+            'type': 'weather'
+        }
+    
+    # Stock Management
+    elif any(word in message for word in ['stock', 'inventory', 'quantity']):
+        return {
+            'text': "Manage your stock effectively:\n1. Regular updates\n2. Set low stock alerts\n3. Track seasonal demands",
+            'links': ['/farmer/inventory/'],
+            'type': 'inventory'
+        }
+
+def get_customer_response(message):
+    """
+    Enhanced response system for customer queries
+    """
+    message = message.lower()
+    
+    # Product Search
+    if any(word in message for word in ['find', 'search', 'looking for']):
+        return {
+            'text': "I can help you find products! What type are you looking for:\n1. Vegetables\n2. Fruits\n3. Grains\n4. Organic products",
+            'links': ['/products/search/'],
+            'type': 'search'
+        }
+    
+    # Order Status
+    elif any(word in message for word in ['order', 'delivery', 'track']):
+        return {
+            'text': "You can:\n1. Track your order in 'My Orders'\n2. Check delivery status\n3. Contact the seller",
+            'links': ['/customer/orders/'],
+            'type': 'order'
+        }
+    
+    # Product Quality
+    elif any(word in message for word in ['quality', 'fresh', 'organic']):
+        return {
+            'text': "Our quality assurance:\n1. Direct from farmers\n2. Freshness guaranteed\n3. Quality checks\n4. Easy returns",
+            'type': 'quality'
+        }
+    
+    # Seasonal Products
+    elif any(word in message for word in ['season', 'available', 'when']):
+        return {
+            'text': "I can help you find seasonal products and their availability. What are you interested in?",
+            'links': ['/seasonal-products/'],
+            'type': 'seasonal'
+        }

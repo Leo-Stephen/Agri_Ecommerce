@@ -13,6 +13,8 @@
     <link rel="stylesheet" type="text/css" href="{% static 'css/CustomerNavBar.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'css/customerdesign.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'css/customer_dashboard.css' %}">
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/chat_widget.css' %}">
 </head>
 <body>
     {% include 'NavBar/CustomerNavBar.html' %}
@@ -444,6 +446,10 @@
 
     <!-- Add after body tag -->
     <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <!-- Add Chat Widget -->
+    <link rel="stylesheet" href="{% static 'css/chat_widget.css' %}">
+    {% include 'chatbot_app/chat_widget.html' %}
 </body>
 </html>
 

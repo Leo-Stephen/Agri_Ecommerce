@@ -1,0 +1,79 @@
+{% load static %}
+<div class="kv-chat-widget">
+    <div class="kv-chat-loading" style="display:none;">
+        <div class="kv-loading-spinner"></div>
+    </div>
+
+    <button class="kv-chat-toggle" 
+        {% if request.user.is_authenticated %}
+            hx-get="{% url 'chatbot_app:toggle_chat' %}"
+            hx-target="#kv-chat-container"
+            hx-swap="innerHTML"
+            hx-trigger="click"
+            hx-indicator=".kv-chat-loading"
+        {% else %}
+            onclick="window.location.href='/login/?next={{ request.path }}'"
+        {% endif %}>
+        <i class="fas fa-comments"></i>
+    </button>
+    
+    <div id="kv-chat-container" class="kv-chat-container {% if show_chat_content %}visible{% endif %}">
+        {% if show_chat_content %}
+            <div class="kv-chat-header">
+                <h3>Chat Support</h3>
+                <button class="kv-close-chat"
+                        hx-get="{% url 'chatbot_app:toggle_chat' %}"
+                        hx-target="#kv-chat-container"
+                        hx-swap="innerHTML">×</button>
+            </div>
+            
+            <div class="kv-chat-messages">
+                {% for message in messages %}
+                    <div class="kv-message {% if message.is_user %}kv-user-message{% else %}kv-bot-message{% endif %}">
+                        <p class="kv-message-text">{{ message.message }}</p>
+                        <small class="kv-message-time">{{ message.created_at|time:"g:i A" }}</small>
+                    </div>
+                {% endfor %}
+            </div>
+            
+            <form class="kv-chat-input" 
+                  hx-post="{% url 'chatbot_app:send_message' %}"
+                  hx-target=".kv-chat-messages"
+                  hx-swap="beforeend">
+                {% csrf_token %}
+                <input type="text" name="message" placeholder="Type your message..." required>
+                <button type="submit">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </form>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Chat widget loaded');
+    
+    htmx.on('htmx:afterRequest', function(evt) {
+        console.log('HTMX Request completed:', evt.detail);
+        const container = document.querySelector('#kv-chat-container');
+        if (container.innerHTML.trim() !== '') {
+            container.classList.add('visible');
+            console.log('Chat container made visible');
+            
+            // Scroll to bottom of messages
+            const messagesDiv = container.querySelector('.kv-chat-messages');
+            if (messagesDiv) {
+                messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            }
+        } else {
+            container.classList.remove('visible');
+            console.log('Chat container hidden');
+        }
+    });
+    
+    htmx.on('htmx:error', function(evt) {
+        console.error('HTMX Error:', evt.detail);
+    });
+});
+</script> 

@@ -4,6 +4,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Farmer Dashboard</title>
     <link rel="stylesheet" type="text/css" href="{% static 'css/farmerdesign.css' %}">
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/chat_widget.css' %}">
 </head>
 <body>
     <header class="header">
@@ -201,5 +203,51 @@
         }
     });
     </script>
+
+    <!-- Add Chat Widget -->
+    <link rel="stylesheet" href="{% static 'css/chat_widget.css' %}">
+    {% include 'chatbot_app/chat_widget.html' %}
+
+    <div class="chat-widget">
+        <button class="chat-toggle" 
+            {% if request.user.is_authenticated %}
+                hx-get="{% url 'chatbot_app:toggle_chat' %}"
+                hx-target="#chat-container"
+                hx-swap="innerHTML"
+            {% else %}
+                onclick="window.location.href='/login/?next={{ request.path }}'"
+            {% endif %}>
+            <i class="fas fa-comments"></i>
+        </button>
+        
+        {% if request.user.is_authenticated %}
+            <div id="chat-container" class="chat-container">
+                {% if request.session.chat_visible %}
+                    <div class="chat-header">
+                        <h3>Chat Support</h3>
+                        <button class="close-chat"
+                                hx-get="{% url 'chatbot_app:toggle_chat' %}"
+                                hx-target="#chat-container"
+                                hx-swap="innerHTML">×</button>
+                    </div>
+                    
+                    <div class="chat-messages">
+                        {% include 'chatbot_app/messages.html' %}
+                    </div>
+                    
+                    <form class="chat-input" 
+                          hx-post="{% url 'chatbot_app:send_message' %}"
+                          hx-target=".chat-messages"
+                          hx-swap="beforeend">
+                        {% csrf_token %}
+                        <input type="text" name="message" placeholder="Type your message..." required>
+                        <button type="submit">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </form>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
 </body>
 </html>

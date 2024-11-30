@@ -1,0 +1,6 @@
+{% for message in messages %}
+    <div class="kv-message {% if message.is_user %}kv-user-message{% else %}kv-bot-message{% endif %}">
+        <p class="kv-message-text">{{ message.message }}</p>
+        <small class="kv-message-time">{{ message.created_at|time:"g:i A" }}</small>
+    </div>
+{% endfor %} 
