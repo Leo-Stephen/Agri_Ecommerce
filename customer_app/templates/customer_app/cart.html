@@ -13,6 +13,8 @@
     <link rel="stylesheet" type="text/css" href="{% static 'css/CustomerNavBar.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'css/customerdesign.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'css/cart.css' %}">
+    <link rel="stylesheet" href="{% static 'css/chat_widget.css' %}">
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
     <style>
         body {
             padding-top: 70px;
@@ -138,75 +140,8 @@
         {% endif %}
     </main>
 
-    <script>
-    document.querySelectorAll('.quantity-form').forEach(form => {
-        form.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const submitButton = this.querySelector('.update-btn');
-            submitButton.disabled = true;
-            
-            try {
-                const formData = new FormData(this);
-                const response = await fetch(this.action, {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
-                        'X-Requested-With': 'XMLHttpRequest'
-                    },
-                    body: formData
-                });
-
-                const data = await response.json();
-                
-                if (response.ok && data.status === 'success') {
-                    // Update item subtotal
-                    const cartItem = this.closest('.cart-item');
-                    const itemTotal = parseFloat(data.item_total);
-                    const cartTotal = parseFloat(data.cart_total);
-                    
-                    cartItem.querySelector('.item-subtotal').textContent = `₹${itemTotal.toFixed(2)}`;
-                    
-                    // Update cart total
-                    document.querySelector('.cart-total').textContent = `Total: ₹${cartTotal.toFixed(2)}`;
-                    
-                    // Update cart count
-                    document.querySelector('.cart-summary span:first-child').textContent = `${data.cart_count} items`;
-                    
-                    // Update summary total
-                    document.querySelector('.summary-total span:last-child').textContent = `₹${cartTotal.toFixed(2)}`;
-                    
-                    // Update navbar cart count
-                    const cartBadge = document.querySelector('.cart-count');
-                    if (cartBadge) cartBadge.textContent = data.cart_count;
-                } else {
-                    throw new Error(data.message || 'Failed to update cart');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                alert(error.message);
-            } finally {
-                submitButton.disabled = false;
-            }
-        });
-    });
-
-    // Quantity button handlers
-    document.querySelectorAll('.quantity-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const form = this.closest('form');
-            const input = form.querySelector('input[name="quantity"]');
-            const currentValue = parseInt(input.value) || 1;
-            
-            if (this.classList.contains('minus')) {
-                input.value = Math.max(1, currentValue - 1);
-            } else {
-                input.value = Math.min(99, currentValue + 1);
-            }
-            
-            // Trigger form submission
-            form.dispatchEvent(new Event('submit'));
-        });
-    });
-    </script>
+    <div id="chat-widget-container">
+        {% include 'chatbot_app/chat_widget.html' %}
+    </div>
 </body>
 </html>

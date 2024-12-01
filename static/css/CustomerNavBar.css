@@ -23,10 +23,11 @@
   width: 100%;
   top: 0;
   left: 0;
-  z-index: 1000;
+  z-index: 100;
   height: 70px;
   display: flex;
   align-items: center;
+  isolation: isolate;
 }
 
 .header-container {
@@ -72,6 +73,7 @@
   align-items: center;
   margin-left: auto;
   gap: 1rem;
+  isolation: isolate;
 }
 
 .nav-list {
@@ -167,9 +169,10 @@
   visibility: hidden;
   transform: translateY(10px);
   transition: all 0.2s ease;
-  z-index: 1000;
+  z-index: 101;
   padding: 8px 0;
   margin-top: 5px;
+  isolation: isolate;
 }
 
 .dropdown-section {
@@ -235,6 +238,7 @@ body {
     padding-top: 45px !important; /* Force override */
     margin: 0;
     font-family: 'Poppins', sans-serif;
+    isolation: isolate;
 }
 
 /* Add padding to the main content container */
