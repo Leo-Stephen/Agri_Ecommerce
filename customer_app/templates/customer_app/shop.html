@@ -45,21 +45,23 @@
                             <div id="searchSuggestions" class="search-suggestions"></div>
                         </div>
                         
-                        <select id="categoryFilter" class="filter-select">
-                            <option value="">All Categories</option>
-                            {% for category_value, category_name in PRODUCT_CATEGORIES %}
-                                <option value="{{ category_value }}" {% if current_category == category_value %}selected{% endif %}>
-                                    <i class="fas {{ CATEGORY_ICONS|get_item:category_value }}"></i> {{ category_name }}
-                                </option>
-                            {% endfor %}
-                        </select>
-                        
-                        <select id="sortFilter" class="filter-select">
-                            <option value="default">Sort By</option>
-                            <option value="price_low">Price: Low to High</option>
-                            <option value="price_high">Price: High to Low</option>
-                            <option value="newest">Newest First</option>
-                        </select>
+                        <div class="filter-selects-container">
+                            <select id="categoryFilter" class="filter-select">
+                                <option value="">All Categories</option>
+                                {% for category_value, category_name in PRODUCT_CATEGORIES %}
+                                    <option value="{{ category_value }}" {% if current_category == category_value %}selected{% endif %}>
+                                        <i class="fas {{ CATEGORY_ICONS|get_item:category_value }}"></i> {{ category_name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                            
+                            <select id="sortFilter" class="filter-select">
+                                <option value="default">Sort By</option>
+                                <option value="price_low">Price: Low to High</option>
+                                <option value="price_high">Price: High to Low</option>
+                                <option value="newest">Newest First</option>
+                            </select>
+                        </div>
                     </div>
 
                     <div class="filter-group-right">
