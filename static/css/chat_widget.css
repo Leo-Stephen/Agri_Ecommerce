@@ -61,23 +61,29 @@
 /* Message styling */
 .kv-message {
     margin: 12px 0;
-    max-width: 85%;
+    max-width: 80%;
     line-height: 1.5;
+    background: #f8f9fa;
+    border-radius: 18px;
+    padding: 12px 16px;
 }
 
 .kv-bot-message {
     margin-right: auto;
-    background: #f8f9fa;
-    padding: 12px 16px;
-    border-radius: 18px;
     color: #2D2D2D;
+}
+
+.kv-bot-message .kv-message-bubble {
+    background-color: #F1F8E9;
+    border-left: 3px solid #8BC34A;
+    margin: 0;
+    width: auto;
+    max-width: 100%;
 }
 
 .kv-user-message {
     margin-left: auto;
     background: #E8F5E9;
-    padding: 12px 16px;
-    border-radius: 18px;
     color: #1B5E20;
 }
 
@@ -158,10 +164,9 @@
 
 /* Common avatar styling */
 .kv-bot-avatar {
-    flex-shrink: 0;  /* Prevent avatar from shrinking */
-    width: 38px;     /* Fixed width */
-    height: 38px;    /* Fixed height */
-    margin-right: 8px;
+    width: 38px;
+    height: 38px;
+    margin-bottom: 8px;
     border-radius: 50%;
     overflow: hidden;
     display: flex;
@@ -170,22 +175,23 @@
 }
 
 .kv-bot-avatar img {
-    width: 100%;     /* Fill the container */
-    height: 100%;    /* Fill the container */
-    object-fit: cover;  /* Maintain aspect ratio */
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
 /* Message content layout */
 .kv-message-content {
     display: flex;
+    flex-direction: column;
     align-items: flex-start;
-    gap: 8px;
-    width: 100%;
+    width: auto;
+    max-width: 100%;
 }
 
 /* Farmer-specific styles */
 .kv-farmer-bot-message .kv-bot-avatar {
-    background: #E8F5E9;  /* Light green background */
+    background: #E8F5E9;
     border: 2px solid #4CAF50;
 }
 
@@ -196,22 +202,20 @@
 
 /* Customer-specific styles */
 .kv-customer-bot-message .kv-bot-avatar {
-    background: #E3F2FD;  /* Light blue background */
-    border: 2px solid #2196F3;
+    background: #E8F5E9;
+    border: 2px solid #4CAF50;
 }
 
 .kv-customer-bot-message .kv-message-bubble {
-    background-color: #E8EAF6;
-    border-left: 3px solid #3F51B5;
+    background-color: #F1F8E9;
+    border-left: 3px solid #8BC34A;
 }
 
 /* Message bubbles */
 .kv-message-bubble {
-    flex: 1;
     padding: 12px 16px;
     border-radius: 12px;
     position: relative;
-    max-width: calc(100% - 46px); /* Account for avatar width + gap */
 }
 
 /* Message meta information */
@@ -252,7 +256,7 @@
 
 /* Customer-specific header */
 .kv-header-customer {
-    background: #2196F3;  /* Blue theme for customers */
+    background: #4CAF50;  /* Green theme for customers */
 }
 
 /* Update existing styles */
@@ -261,7 +265,7 @@
 }
 
 .kv-chat-customer .kv-chat-toggle {
-    background: #2196F3;
+    background: #4CAF50;
 }
 
 /* Update loading spinner */
