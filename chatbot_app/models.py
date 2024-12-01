@@ -43,6 +43,11 @@ class ChatMessage(models.Model):
     def __str__(self):
         return f"Chat with {self.user.username} at {self.created_at}" 
 
+    def get_message_class(self):
+        """Return CSS class based on user type and message sender"""
+        user_type = 'farmer' if hasattr(self.user, 'farmerprofile') else 'customer'
+        return f"kv-{user_type}-{'user' if self.is_user else 'bot'}-message"
+
 class APIUsage(models.Model):
     """Track API usage and costs"""
     timestamp = models.DateTimeField(auto_now_add=True)

@@ -146,3 +146,111 @@
 .kv-chat-toggle:hover {
     transform: scale(1.05);
 }
+
+/* Common avatar styling */
+.kv-bot-avatar {
+    flex-shrink: 0;  /* Prevent avatar from shrinking */
+    width: 38px;     /* Fixed width */
+    height: 38px;    /* Fixed height */
+    margin-right: 8px;
+    border-radius: 50%;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.kv-bot-avatar img {
+    width: 100%;     /* Fill the container */
+    height: 100%;    /* Fill the container */
+    object-fit: cover;  /* Maintain aspect ratio */
+}
+
+/* Message content layout */
+.kv-message-content {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    width: 100%;
+}
+
+/* Farmer-specific styles */
+.kv-farmer-bot-message .kv-bot-avatar {
+    background: #E8F5E9;  /* Light green background */
+    border: 2px solid #4CAF50;
+}
+
+.kv-farmer-bot-message .kv-message-bubble {
+    background-color: #F1F8E9;
+    border-left: 3px solid #8BC34A;
+}
+
+/* Customer-specific styles */
+.kv-customer-bot-message .kv-bot-avatar {
+    background: #E3F2FD;  /* Light blue background */
+    border: 2px solid #2196F3;
+}
+
+.kv-customer-bot-message .kv-message-bubble {
+    background-color: #E8EAF6;
+    border-left: 3px solid #3F51B5;
+}
+
+/* Message bubbles */
+.kv-message-bubble {
+    flex: 1;
+    padding: 12px 16px;
+    border-radius: 12px;
+    position: relative;
+    max-width: calc(100% - 46px); /* Account for avatar width + gap */
+}
+
+/* Message meta information */
+.kv-message-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 4px;
+    font-size: 0.75em;
+    color: #757575;
+}
+
+/* Message type tag */
+.kv-message-tag {
+    font-size: 0.75em;
+    padding: 2px 8px;
+    border-radius: 12px;
+    background: rgba(0, 0, 0, 0.05);
+}
+
+/* Remove any conflicting styles from chat.css */
+.general-chat-container,
+.general-chat-header,
+.general-chat-messages,
+.general-message,
+.general-user-message,
+.general-bot-message {
+    /* Reset any conflicting styles */
+    max-width: none;
+    margin: initial;
+    width: auto;
+}
+
+/* Farmer-specific header */
+.kv-header-farmer {
+    background: #4CAF50;  /* Green theme for farmers */
+}
+
+/* Customer-specific header */
+.kv-header-customer {
+    background: #2196F3;  /* Blue theme for customers */
+}
+
+/* Update existing styles */
+.kv-chat-farmer .kv-chat-toggle {
+    background: #4CAF50;
+}
+
+.kv-chat-customer .kv-chat-toggle {
+    background: #2196F3;
+}

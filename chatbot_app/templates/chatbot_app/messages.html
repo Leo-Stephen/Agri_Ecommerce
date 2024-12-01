@@ -2,7 +2,7 @@
 {% load tz %}
 {% for message in messages %}
     {% if message.is_user %}
-        <div class="kv-message kv-user-message">
+        <div class="kv-message kv-user-message {{ message.get_message_class }}">
             <div class="kv-message-content">
                 <div class="kv-message-bubble">
                     {{ message.message|linebreaks }}
@@ -18,7 +18,7 @@
             </div>
         </div>
     {% else %}
-        <div class="kv-message kv-bot-message">
+        <div class="kv-message kv-bot-message {{ message.get_message_class }}">
             <div class="kv-message-content">
                 <div class="kv-bot-avatar">
                     <img src="{% static 'images/bot-avatar.png' %}" alt="Bot" width="38" height="38">

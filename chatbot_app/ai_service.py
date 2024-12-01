@@ -45,27 +45,37 @@ class GeminiService:
         return len(text) // 4
     
     def get_response(self, message, user_type, message_type):
-        cache_key = f"gemini_response_{hash(f'{message}_{user_type}_{message_type}')}"
+        cache_key = f"gemini_response_{user_type}_{hash(f'{message}_{message_type}')}"
         cached_response = cache.get(cache_key)
         if cached_response:
             return cached_response
-            
+        
         try:
-            prompt = f"""As Kisan Vishwa's AI assistant for {user_type}s:
-            - Message type: {message_type}
-            - User query: {message}
+            # User-type specific prompts
+            base_prompts = {
+                'farmer': """You are Kisan Vishwa's AI assistant for farmers. Your role is to:
+                    - Provide expert agricultural advice
+                    - Share market prices and trends
+                    - Guide on crop management and best practices
+                    - Help with inventory and selling
+                    - Offer weather-related farming advice
+                    Always maintain a professional, knowledgeable tone focused on farming.""",
+                'customer': """You are Kisan Vishwa's AI assistant for customers. Your role is to:
+                    - Help find and select fresh produce
+                    - Provide detailed product information
+                    - Assist with orders and delivery
+                    - Share food storage and usage tips
+                    - Guide through the shopping experience
+                    Always maintain a friendly, helpful tone focused on shopping."""
+            }
+
+            prompt = f"""{base_prompts[user_type]}
+
+            Previous context: The user is a {user_type}.
+            Message type: {message_type}
+            User query: {message}
             
-            For farmers, help with:
-            - Market prices and trends
-            - Weather and crop advice
-            - Inventory management
-            
-            For customers, help with:
-            - Product information
-            - Order tracking
-            - Shopping assistance
-            
-            Provide a helpful, concise response."""
+            Provide a helpful, concise response appropriate for a {user_type}."""
             response = self.model.generate_content(prompt)
             
             # Calculate and log API usage

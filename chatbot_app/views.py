@@ -13,9 +13,13 @@ gemini_service = GeminiService()
 
 @login_required
 def get_messages(request):
-    """Retrieve chat messages for the current user"""
+    """Retrieve chat messages for the current user only"""
     messages = ChatMessage.objects.filter(user=request.user).order_by('created_at')
-    return render(request, 'chatbot_app/messages.html', {'messages': messages})
+    user_type = 'farmer' if hasattr(request.user, 'farmerprofile') else 'customer'
+    return render(request, 'chatbot_app/messages.html', {
+        'messages': messages,
+        'user_type': user_type
+    })
 
 @require_http_methods(["POST"])
 def send_message(request):
@@ -43,7 +47,7 @@ def send_message(request):
             message_type=message_type
         )
         
-        # Get AI response
+        # Get AI response with user type
         ai_response = gemini_service.get_response(message, user_type, message_type)
         if ai_response is None:
             ai_response = get_bot_response(message, user_type, message_type)
@@ -74,10 +78,17 @@ def toggle_chat(request):
     
     if not is_visible:  # Opening the chat
         messages = ChatMessage.objects.filter(user=request.user).order_by('created_at')
+        user_type = 'farmer' if hasattr(request.user, 'farmerprofile') else 'customer'
+        
         if not messages:
+            welcome_message = (
+                "Hello farmer! How can I help you with your farming business today?" 
+                if user_type == 'farmer' 
+                else "Welcome! How can I assist you with your shopping today?"
+            )
             ChatMessage.objects.create(
                 user=request.user,
-                message="Hello! How can I assist you today?",
+                message=welcome_message,
                 is_user=False,
                 message_type='general'
             )
@@ -85,7 +96,8 @@ def toggle_chat(request):
         
         return TemplateResponse(request, 'chatbot_app/chat_widget.html', {
             'messages': messages,
-            'show_chat_content': True
+            'show_chat_content': True,
+            'user_type': user_type
         })
     
     return HttpResponse('')

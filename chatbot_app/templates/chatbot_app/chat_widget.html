@@ -1,5 +1,5 @@
 {% load static %}
-<div class="kv-chat-widget">
+<div class="kv-chat-widget" data-user-type="{{ user_type }}">
     <div class="kv-chat-loading" style="display:none;">
         <div class="kv-loading-spinner"></div>
     </div>
@@ -17,10 +17,10 @@
         <i class="fas fa-comments"></i>
     </button>
     
-    <div id="kv-chat-container" class="kv-chat-container {% if show_chat_content %}visible{% endif %}">
+    <div id="kv-chat-container" class="kv-chat-container {% if show_chat_content %}visible{% endif %} kv-chat-{{ user_type }}">
         {% if show_chat_content %}
-            <div class="kv-chat-header">
-                <h3>Chat Support</h3>
+            <div class="kv-chat-header kv-header-{{ user_type }}">
+                <h3>{{ user_type|title }} Support</h3>
                 <button class="kv-close-chat"
                         hx-get="{% url 'chatbot_app:toggle_chat' %}"
                         hx-target="#kv-chat-container"
