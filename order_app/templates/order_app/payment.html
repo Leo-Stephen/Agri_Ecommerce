@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Page</title>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</head>
+<body>
+    <h1>Complete Your Payment</h1>
+
+    <div>
+        <p>Order ID: {{ order.order_id }}</p>
+        <p>Total Amount: ₹{{ amount|floatformat:2 }}</p> <!-- Display the amount in INR -->
+    </div>
+
+    <form action="{% url 'payment_callback' %}" method="POST" id="payment-form">
+        {% csrf_token %}
+        <input type="hidden" name="razorpay_order_id" value="{{ order_id }}">
+        <input type="hidden" name="razorpay_payment_id" id="razorpay_payment_id">
+        <input type="hidden" name="razorpay_signature" id="razorpay_signature">
+    </form>
+
+
+
+    <button id="pay-btn">Pay Now</button>
+
+    <script>
+        var options = {
+            "key": "{{ razorpay_key }}",  // Razorpay Key ID
+            "amount": "{{ amount }}",      // Use the amount in paise (passed from view)
+            "currency": "INR",
+            "order_id": "{{ order_id }}",  // Razorpay Order ID
+            "name": "Kisan Vishwa",
+            "description": "Secure Payment for your order",
+            "image": "/static/images/logo.png", // Optional: your company logo
+            "theme": {
+                "color": "#F37254"  // Optional: Theme color
+            },
+            "handler": function (response) {
+                document.getElementById('razorpay_payment_id').value = response.razorpay_payment_id;
+                document.getElementById('razorpay_signature').value = response.razorpay_signature;
+                document.getElementById('payment-form').submit();
+            },
+            "prefill": {
+                "name": "{{ user.first_name|default:'User' }}",
+                "email": "{{ user.email|default:'user@example.com' }}"
+            },
+        };
+
+        document.getElementById('pay-btn').onclick = function(e) {
+            rzp1.open();
+            e.preventDefault();
+        };
+
+        var rzp1 = new Razorpay(options);
+    </script>
+</body>
+</html>

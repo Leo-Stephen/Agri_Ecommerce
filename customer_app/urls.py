@@ -20,4 +20,5 @@ urlpatterns = [
     path('notifications/', views.customer_notifications, name='customer_notifications'),
     path('support/', views.customer_support, name='customer_support'),
     path('feedback/', views.customer_feedback, name='customer_feedback'),
+    path('checkout/', views.checkout, name='checkout'),
 ]

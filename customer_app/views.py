@@ -10,6 +10,10 @@ from django.core.paginator import Paginator
 import json
 from django.db.models import Q
 from django.core.paginator import PageNotAnInteger, EmptyPage
+from django.views.decorators.csrf import ensure_csrf_cookie
+from decimal import Decimal
+
+from order_app.views import initiate_payment
 
 @login_required
 def customer_dashboard(request):
@@ -138,50 +142,59 @@ def view_orders(request):
     })
 
 
-def calculate_total_savings(user):
-    orders = Order.objects.filter(user=user)
-    total_savings = 0
+# def calculate_total_savings(user):
+#     orders = Order.objects.filter(user=user)
+#     total_savings = 0
     
-    for order in orders:
-        if hasattr(order.product, 'original_price') and order.product.original_price > order.product.price:
-            savings = (order.product.original_price - order.product.price) * order.quantity
-            total_savings += savings
+#     for order in orders:
+#         if hasattr(order.product, 'original_price') and order.product.original_price > order.product.price:
+#             savings = (order.product.original_price - order.product.price) * order.quantity
+#             total_savings += savings
     
-    return total_savings
+#     return total_savings
 
 
+@ensure_csrf_cookie
 @login_required
 def update_cart_quantity(request, item_id):
     if request.method == 'POST':
         cart_item = get_object_or_404(CartItem, id=item_id, user=request.user)
         try:
             quantity = int(request.POST.get('quantity', 1))
-            if quantity > 0 and quantity <= 99:
+            if 1 <= quantity <= 99:
                 cart_item.quantity = quantity
                 cart_item.save()
                 
                 # Calculate new totals
                 cart_items = CartItem.objects.filter(user=request.user)
-                cart_total = sum(item.product.price * item.quantity for item in cart_items)
+                cart_total = sum(item.total_price for item in cart_items)
                 
                 return JsonResponse({
                     'status': 'success',
-                    'message': 'Cart updated successfully',
-                    'item_total': float(cart_item.product.price * cart_item.quantity),
+                    'item_total': float(cart_item.total_price),
                     'cart_total': float(cart_total),
                     'cart_count': cart_items.count()
                 })
-            else:
-                raise ValueError('Invalid quantity')
-        except ValueError as e:
+            
+            return JsonResponse({
+                'status': 'error',
+                'message': 'Quantity must be between 1 and 99'
+            }, status=400)
+            
+        except ValueError:
+            return JsonResponse({
+                'status': 'error',
+                'message': 'Invalid quantity'
+            }, status=400)
+        except Exception as e:
             return JsonResponse({
                 'status': 'error',
                 'message': str(e)
             }, status=400)
-            
+    
     return JsonResponse({
         'status': 'error',
-        'message': 'Invalid request'
+        'message': 'Invalid request method'
     }, status=400)
 
 
@@ -355,3 +368,33 @@ def customer_support(request):
 @login_required
 def customer_feedback(request):
     return render(request, 'customer_app/feedback.html')
+
+
+@login_required
+def checkout(request):
+    # Check if the user has items in their cart
+    cart_items = CartItem.objects.filter(user=request.user)
+
+    if not cart_items:
+        messages.error(request, "Your cart is empty.")
+        return redirect('cart')  # Redirect back to cart if it's empty
+
+    # Redirect to order_app initiate_payment view for payment processing
+    return initiate_payment(request)  # This will call the Razorpay payment flow
+
+def calculate_total_savings(user):
+    total_savings = 0
+    # Retrieve all orders placed by the user
+    orders = Order.objects.filter(user=user)
+
+    for order in orders:
+        # Iterate over all items in the order
+        for order_item in order.items.all():
+            product = order_item.product
+            # Check if the product has an original price and if the original price is greater than the current price
+            if hasattr(product, 'original_price') and product.original_price and product.original_price > product.price:
+                # Calculate savings for this item
+                savings = (product.original_price - product.price) * order_item.quantity
+                total_savings += savings
+
+    return total_savings

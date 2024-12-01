@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Failed</title>
+    <link rel="stylesheet" href="{% static 'order_app/css/style.css' %}">
+</head>
+<body>
+    <div class="container">
+        <h1>Order Failed</h1>
+        <p>Unfortunately, your payment could not be processed at this time.</p>
+        <p>Please try again or contact our support team if the issue persists.</p>
+        <a href="{% url 'customer_app:cart' %}" class="btn btn-danger">Return to Cart</a>
+    </div>
+</body>
+</html>

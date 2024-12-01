@@ -145,13 +145,13 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 MEDIA_URL = '/media/'  # URL prefix for media files
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')  # Directory to store uploaded media files
 
-# Default primary key field type
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-RAZORPAY_KEY_ID = 'rzp_test_rt5J95NBZHv5at'
-RAZORPAY_KEY_SECRET = 'D6PPpadcpj8NLppy5cidzHBf'
-
 # Gemini AI Settings
 GEMINI_API_KEY = 'AIzaSyDdZAbaZo9hcWDBRl4KOJ3COBlautgjmQs'  # For development only
 # For production, use:
 # GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY')
+
+# Default primary key field type
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+RAZORPAY_KEY_ID = 'rzp_test_lNyuOZQFkbws4M'
+RAZORPAY_KEY_SECRET = 'DCjJxhEAvpGUObqNyjjJ6EkV'

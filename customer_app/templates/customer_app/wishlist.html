@@ -72,5 +72,147 @@
     <div id="chat-widget-container">
         {% include 'chatbot_app/chat_widget.html' %}
     </div>
+
+    <script>
+        async function addToCart(productId, button) {
+            try {
+                button.disabled = true;
+                button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                
+                const response = await fetch(`/customer/add-to-cart/${productId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showToast(data.message || 'Product added to cart');
+                    button.classList.add('success');
+                } else {
+                    throw new Error(data.message);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('Error adding to cart');
+            } finally {
+                setTimeout(() => {
+                    button.disabled = false;
+                    button.innerHTML = '<i class="fas fa-cart-plus"></i> Add to Cart';
+                    button.classList.remove('success');
+                }, 1000);
+            }
+        }
+
+        async function toggleWishlist(productId) {
+            try {
+                const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+                const response = await fetch(`/customer/toggle-wishlist/${productId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': csrfToken,
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    // Remove the wishlist card from the UI
+                    const wishlistCard = document.querySelector(`[data-product-id="${productId}"]`);
+                    if (wishlistCard) {
+                        wishlistCard.remove();
+                    }
+                    // Update wishlist count if displayed
+                    const wishlistCount = document.querySelector('.wishlist-summary span');
+                    if (wishlistCount) {
+                        const currentCount = parseInt(wishlistCount.textContent);
+                        wishlistCount.textContent = `${currentCount - 1} items`;
+                    }
+                    showToast(data.message);
+                    
+                    // If no items left, show empty wishlist message
+                    const wishlistGrid = document.querySelector('.wishlist-grid');
+                    if (wishlistGrid && !wishlistGrid.children.length) {
+                        location.reload(); // Reload to show empty state
+                    }
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('Error updating wishlist');
+            }
+        }
+
+        function showToast(message) {
+            const existingToast = document.querySelector('.toast-notification');
+            if (existingToast) {
+                existingToast.remove();
+            }
+            
+            const toast = document.createElement('div');
+            toast.className = 'toast-notification';
+            toast.innerHTML = `
+                <div class="toast-content">
+                    <i class="fas fa-info-circle"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+            document.body.appendChild(toast);
+            
+            requestAnimationFrame(() => {
+                toast.classList.add('show');
+            });
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+    </script>
+
+    <style>
+        .add-to-cart-btn {
+            transition: all 0.3s ease;
+        }
+        
+        .add-to-cart-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+        
+        .add-to-cart-btn.success {
+            background-color: #4CAF50;
+            transform: scale(1.05);
+        }
+        
+        .toast-notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #333;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 4px;
+            opacity: 0;
+            transform: translateY(100%);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .toast-notification.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .toast-content {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+    </style>
 </body>
 </html>
