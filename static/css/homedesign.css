@@ -176,6 +176,8 @@ body {
   height: 0; /* Initial height set to zero */
   padding-bottom: 100%; /* Aspect ratio: 1:1 (square) */
   position: relative; /* Position relative to contain the image */
+  overflow: hidden; /* Ensures the image border-radius is visible */
+  border-radius: 8px; /* Added rounded corners for the container */
 }
 
 .product-card img {
@@ -185,7 +187,9 @@ body {
   width: 100%; /* Full width of the container */
   height: 100%; /* Full height of the container */
   object-fit: cover; /* Cover the area */
-  margin-bottom: 10px; /* Space below the image */
+  margin-bottom: 12px; /* Space below the image */
+  border-radius: 4px; /* Added rounded corners for product images */
+  transition: border-radius 0.3s ease; /* Smooth transition for border-radius */
 }
 
 .product-card h3 {
@@ -423,165 +427,191 @@ body {
 }
 
 .blog-highlights {
-  padding: 60px 20px; /* Increased padding for spacious feel */
-  background-color: #F7F5EB; /* Light background for contrast */
-  text-align: center; /* Center text for headings */
-  border-radius: 10px; /* Rounded corners for section */
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+  padding: 60px 20px;
+  background-color: #F7F5EB;
+  text-align: center;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 .blog-highlights h2 {
-  font-size: 2.5rem; /* Consistent font size for headings */
-  margin-bottom: 30px; /* Space below title */
-  color: #333; /* Darker color for headings */
+  font-size: 2.5rem;
+  margin-bottom: 30px;
+  color: #333;
 }
 
 .blog-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); /* Responsive grid */
-  gap: 30px; /* Space between cards */
+  grid-template-columns: repeat(5, 1fr); /* 5 equal columns */
+  gap: 20px;
+  padding: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
 .blog-card {
-  display: flex; /* Enable flexbox */
-  flex-direction: column; /* Arrange content in a column */
-  justify-content: space-between; /* Ensure the button is pushed to the bottom */
-  background-color: #ffffff; /* White background for cards */
-  border-radius: 10px; /* Rounded corners */
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Shadow for depth */
-  overflow: hidden; /* Ensures rounded corners work on child elements */
-  transition: transform 0.3s ease, box-shadow 0.3s ease; /* Animation for hover effect */
-  padding: 20px; /* Add padding inside the card to create space */
+  display: flex;
+  flex-direction: column;
+  height: 440px;
+  background-color: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  padding: 8px;
 }
 
 .blog-card:hover {
-  transform: translateY(-5px); /* Lift effect on hover */
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2); /* Deepen shadow on hover */
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
 }
 
 .blog-card img {
-  margin-bottom: 15px; /* Space below image */
-  width: 100%; /* Full width for the image */
-  height: auto; /* Maintain aspect ratio */
-  border-bottom: 3px solid #28a745; /* Decorative border for image */
+  width: calc(100% - 16px);
+  height: 250px;
+  object-fit: contain;
+  object-position: center top;
+  margin: 8px;
+  margin-top: 4px;
+  border-radius: 8px;
 }
 
 .blog-card h3 {
-  font-size: 1.5rem; /* Title size */
-  color: #333; /* Dark color for text */
-  margin: 15px 0; /* Space around title */
+  font-size: 1rem;
+  margin: 8px 0;
+  line-height: 1.3;
+  margin-top: 0;
 }
 
 .blog-card p {
-  flex-grow: 1; /* Allow the paragraph to grow and fill space */
-  font-size: 1rem; /* Excerpt size */
-  color: #555; /* Adjusted for better contrast */
-  margin: 0 0 20px 0; /* Space below the paragraph */
+  font-size: 0.85rem;
+  line-height: 1.4;
+  margin: 0 0 10px 0;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  transition: all 0.3s ease;
+}
+
+.blog-card.expanded p {
+  -webkit-line-clamp: unset;
 }
 
 .read-more {
-  display: inline-block; /* Inline block for button appearance */
-  margin-top: auto; /* Push the button to the bottom */
-  padding: 10px 25px; /* Padding for button */
-  background-color: #28a745; /* Green background for button */
-  color: white; /* White text for contrast */
-  border: none; /* No border */
-  border-radius: 5px; /* Rounded corners */
-  text-decoration: none; /* No underline on links */
-  font-weight: bold; /* Bold text for emphasis */
-  transition: background-color 0.3s ease, transform 0.3s ease; /* Animation for hover */
+  margin-top: auto;
+  padding: 8px 20px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+  cursor: pointer;
+  width: 80%;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 10px;
+  font-size: 0.9rem;
 }
 
 .read-more:hover {
-  background-color: #218838; /* Darker green on hover */
-  transform: scale(1.05); /* Slightly enlarge on hover */
+  background-color: #218838;
+  transform: scale(1.05);
 }
 
-/* Media queries for responsive adjustments */
-@media (max-width: 768px) {
-  .blog-highlights {
-    padding: 40px 15px; /* Adjusted padding for smaller screens */
-  }
-
+@media (max-width: 1200px) {
   .blog-grid {
-    grid-template-columns: 1fr; /* Stack cards on smaller screens */
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .blog-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .blog-grid {
+    grid-template-columns: 1fr;
   }
 }
 
 :root {
-  --font-size-h2: 2.5rem; /* Heading size */
-  --font-size-p: 1rem;    /* Paragraph size */
+  --font-size-h2: 2.5rem;
+  --font-size-p: 1rem;
 }
 
 .newsletter {
-  background-color: #218838; /* Fresh look */
-  color: white; /* Contrast */
-  padding: 50px 20px; /* Spacing */
-  text-align: center; /* Center text */
-  border-radius: 10px; /* Rounded corners */
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Depth */
+  background-color: #218838;
+  color: white;
+  padding: 50px 20px;
+  text-align: center;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
 .newsletter h2 {
-  font-size: var(--font-size-h2); /* Consistent heading size */
-  margin-bottom: 15px; /* Spacing */
+  font-size: var(--font-size-h2);
+  margin-bottom: 15px;
 }
 
 .newsletter p {
-  font-size: var(--font-size-p); /* Consistent paragraph size */
-  margin-bottom: 20px; /* Spacing */
-  color: #f0f0f0; /* Softer description color */
+  font-size: var(--font-size-p);
+  margin-bottom: 20px;
+  color: #f0f0f0;
 }
 
 .newsletter form {
-  display: flex; /* Flexbox */
-  justify-content: center; /* Center elements */
-  align-items: center; /* Center vertically */
-  margin-top: 20px; /* Spacing */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
 }
 
 .newsletter input[type="email"] {
-  padding: 15px; /* Input padding */
-  width: 300px; /* Width */
-  border: none; /* No border */
-  border-radius: 5px; /* Rounded corners */
-  margin-right: 10px; /* Spacing */
-  font-size: var(--font-size-p); /* Consistent input size */
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Depth */
+  padding: 15px;
+  width: 300px;
+  border: none;
+  border-radius: 5px;
+  margin-right: 10px;
+  font-size: var(--font-size-p);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .subscribe-btn {
-  background-color: white; /* Button background */
-  color: #218838; /* Button text color */
-  border: none; /* No border */
-  padding: 12px 25px; /* Button padding */
-  border-radius: 5px; /* Rounded corners */
-  font-size: var(--font-size-p); /* Consistent button size */
-  cursor: pointer; /* Pointer cursor */
-  transition: background-color 0.3s ease, transform 0.3s ease; /* Animation */
+  background-color: white;
+  color: #218838;
+  border: none;
+  padding: 12px 25px;
+  border-radius: 5px;
+  font-size: var(--font-size-p);
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
 .subscribe-btn:hover {
-  background-color: #f0f0f0; /* Hover color */
-  transform: scale(1.05); /* Enlarge */
+  background-color: #f0f0f0;
+  transform: scale(1.05);
 }
 
-/* Media query for responsiveness */
 @media (max-width: 480px) {
   .newsletter input[type="email"] {
-    width: 200px; /* Adjust width */
+    width: 200px;
   }
 }
 
 :root {
-  --font-size-h3: 1.5rem; /* Heading size for h3 */
-  --font-size-footer: 0.9em; /* Footer text size */
-  --footer-background: #444; /* Dark gray */
-  --footer-text: white; /* White text */
-  --footer-heading: #218838; /* Green heading */
-  --footer-link-hover: #218838; /* Hover link color */
-  --footer-link-color: white; /* Link color */
-  --footer-bottom-text: #ccc; /* Footer bottom text color */
+  --font-size-h3: 1.5rem;
+  --font-size-footer: 0.9em;
+  --footer-background: #444;
+  --footer-text: white;
+  --footer-heading: #218838;
+  --footer-link-hover: #218838;
+  --footer-link-color: white;
+  --footer-bottom-text: #ccc;
 }
 
 footer {
@@ -615,7 +645,7 @@ footer {
 .contact-info h3 {
   color: var(--footer-heading);
   margin-bottom: 10px;
-  font-size: var(--font-size-h3); /* Consistent heading size */
+  font-size: var(--font-size-h3);
 }
 
 .footer-links li {
@@ -626,12 +656,12 @@ footer {
 .social-icon {
   color: var(--footer-link-color);
   text-decoration: none;
-  transition: color 0.3s; /* Animation for hover */
+  transition: color 0.3s;
 }
 
 .footer-links a:hover,
 .social-icon:hover {
-  color: var(--footer-link-hover); /* Change color on hover */
+  color: var(--footer-link-hover);
 }
 
 .social-media {
@@ -647,7 +677,7 @@ footer {
 }
 
 .social-icon:hover {
-  background-color: rgba(255, 255, 255, 0.2); /* Highlight on hover */
+  background-color: rgba(255, 255, 255, 0.2);
 }
 
 .contact-info p {
@@ -655,12 +685,12 @@ footer {
 }
 
 .contact-info a {
-  color: var(--footer-heading); /* Light green for email link */
-  text-decoration: underline; /* Underline for clarity */
+  color: var(--footer-heading);
+  text-decoration: underline;
 }
 
 .contact-info a:hover {
-  color: #218838; /* Lighter green on hover */
+  color: #218838;
 }
 
 .footer-bottom {
@@ -675,7 +705,6 @@ footer {
   color: var(--footer-bottom-text);
 }
 
-/* Media query for responsiveness */
 @media (max-width: 768px) {
   .footer-container {
     flex-direction: column;
@@ -687,10 +716,14 @@ footer {
   .footer-links,
   .social-media,
   .contact-info {
-    margin: 10px; /* Reduced margin for smaller screens */
+    margin: 10px;
   }
 
   footer {
-    padding: 20px 10px; /* Reduced padding */
+    padding: 20px 10px;
   }
+}
+
+.blog-grid img {
+  border-radius: 8px !important;
 }
