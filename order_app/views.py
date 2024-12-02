@@ -20,8 +20,8 @@ def initiate_payment(request):
         # Calculate total cart amount
         cart_total = sum(item.total_price for item in cart_items)
 
-        # Calculate the amount in paise (1 INR = 100 paise)
-        amount_in_paise = int(cart_total * 10)
+        # Convert to paise for Razorpay (1 INR = 100 paise)
+        amount_in_paise = int(cart_total * 100)
 
         # Create Razorpay order
         razorpay_order = razorpay_client.order.create({
@@ -47,7 +47,8 @@ def initiate_payment(request):
         context = {
             'razorpay_key': settings.RAZORPAY_KEY_ID,
             'order_id': razorpay_order['id'],
-            'amount': amount_in_paise,  # Pass the calculated amount in paise
+            'amount': cart_total,  # Pass the original amount in rupees for display
+            'amount_in_paise': amount_in_paise,  # Pass paise amount for Razorpay
             'order': order,
         }
         return render(request, 'order_app/payment.html', context)
