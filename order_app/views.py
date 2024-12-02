@@ -21,7 +21,7 @@ def initiate_payment(request):
         cart_total = sum(item.total_price for item in cart_items)
 
         # Calculate the amount in paise (1 INR = 100 paise)
-        amount_in_paise = int(cart_total * 100)
+        amount_in_paise = int(cart_total * 10)
 
         # Create Razorpay order
         razorpay_order = razorpay_client.order.create({

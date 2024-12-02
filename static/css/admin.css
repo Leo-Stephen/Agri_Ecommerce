@@ -1,11 +1,75 @@
+/* Container Styles */
+.container {
+  margin: 20px auto;
+  width: 90%;
+  max-width: 1200px;
+  text-align: center;
+}
+
+h1 {
+  font-size: 2.5rem;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+/* Stat Box Styles */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.stat-box {
+  text-align: center;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s;
+}
+
+.stat-box:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.stat-box h2 {
+  font-size: 1.5rem;
+  color: #555;
+  margin-bottom: 10px;
+}
+
+.stat-box p {
+  font-size: 1rem;
+  color: #777;
+}
+
+.stat-box a {
+  text-decoration: none;
+  color: #28a745;
+  font-weight: bold;
+}
+
+.stat-box a:hover {
+  color: #218838;
+}
+
+.section-image {
+  width: 95%; /* Scales the image width */
+  height: auto; /* Maintains aspect ratio */
+  margin-bottom: 10px;
+  border-radius: 8px;
+}
+
+
 /* Navigation Bar Styles */
 nav ul {
   list-style-type: none;
   margin: 0;
   padding: 0;
   display: flex;
-  justify-content: center;  /* Ensures horizontal centering of navigation items */
-  align-items: center;  /* Aligns items vertically in the center */
+  justify-content: space-between;
 }
 
 nav ul li {
@@ -14,118 +78,61 @@ nav ul li {
 
 nav ul li a {
   text-decoration: none;
-  color: #333; /* Dark text for links */
-  transition: color 0.3s; /* Smooth transition for hover effect */
-  font-size: 1rem; /* Example for consistent font size with the logo */
+  color: #333;
+  transition: color 0.3s;
+  font-size: 1rem;
 }
 
 nav ul li a:hover {
-  color: #A8D45C; /* Change color on hover to accent green */
+  color: #A8D45C;
 }
 
-/* Logo Styles */
 .logo img {
-  height: 50px; /* Adjust height as needed */
-  width: auto;  /* Maintain aspect ratio */
+  height: 50px;
+  width: auto;
 }
 
-.logo {
-  font-size: 1.5rem; /* Adjust to match navigation font size */
-  font-weight: bold;
-  color: #333; /* Dark text for contrast */
-}
-
-/* Search and Cart Area */
-.search-cart {
-  display: flex;
-  align-items: center;
-}
-
-.search-cart input[type="text"] {
-  padding: 8px;
-  border: 1px solid #e0e0e0; /* Light grey border */
-  border-radius: 20px; /* Rounded corners */
-  margin-right: 10px; /* Space between input and cart icon */
-  font-size: 1rem; /* Consistent font size */
-}
-
-/* Cart Icon */
-.cart-icon {
-  text-decoration: none;
-  font-size: 20px; /* Size for the cart icon */
-  color: #A8D45C; /* Accent color for the cart icon */
-  transition: color 0.3s; /* Smooth transition for hover effect */
-}
-
-.cart-icon:hover {
-  color: #FF0000; /* Change to red on hover */
-}
-
-/* Login/Signup Buttons */
-.login-btn,
-.signup-btn {
-  margin-left: 10px; /* Space between buttons */
-  padding: 8px 12px; /* Button padding */
-  background-color: #28a745; /* Primary button background color */
-  color: white; /* Text color */
-  text-decoration: none; /* Remove underline */
-  border-radius: 4px; /* Rounded corners */
-  transition: background-color 0.3s; /* Smooth transition */
-  font-size: 1rem; /* Consistent font size */
-}
-
-.login-btn:hover,
-.signup-btn:hover {
-  background-color: #218838; /* Darker shade on hover */
-}
-
-/* Header Container */
 header {
-  background-color: #F7F5EB; /* Soft Beige background */
+  background-color: #F7F5EB;
   display: flex;
   justify-content: space-between;
   align-items: center;
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
   padding: 10px 20px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
-}
-
-header h1,
-header nav a {
-  font-size: 1.2rem; /* Example for consistent font size */
-  color: #090908; /* Ensure contrast with background */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 /* Mobile Responsiveness */
 @media (max-width: 768px) {
-  header {
-    flex-direction: column; /* Adjust layout on smaller screens */
-    padding: 10px; /* Reduce padding if needed */
+  .stats {
+      grid-template-columns: 1fr;
   }
 
   nav ul {
-    flex-direction: column; /* Stack items vertically on mobile */
-    padding: 0; /* Adjust padding */
-    align-items: center;  /* Ensure centering of items on mobile */
+      flex-direction: column;
+      align-items: center;
   }
+}
+/* Logout Button */
+.logout-btn {
+  margin-left: 15px; /* Space between the cart and logout button */
+  padding: 8px 12px;
+  background-color: #dc3545; /* Red background for logout button */
+  color: white;
+  text-decoration: none;
+  border-radius: 4px;
+  transition: background-color 0.3s, color 0.3s;
+  font-size: 1rem;
+}
 
-  nav ul li {
-    margin: 10px 0; /* Adjust margin for vertical spacing */
-  }
+.logout-btn:hover {
+  background-color: #c82333; /* Darker red on hover */
+  color: #fff; /* Ensure text remains visible */
+}
 
-  .search-cart {
-    flex-direction: column; /* Stack elements vertically */
-    align-items: flex-start; /* Align items to the start */
-  }
-
-  .search-cart input[type="text"] {
-    margin-bottom: 10px; /* Space below input on mobile */
-    width: 100%; /* Full width input */
-  }
-
-  .login-btn,
-  .signup-btn {
-    margin-left: 0; /* Remove left margin on mobile */
-    width: 100%; /* Full width buttons */
-  }
+/* Search and Cart Area Alignment */
+.search-cart {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* Adjust spacing between elements */
 }

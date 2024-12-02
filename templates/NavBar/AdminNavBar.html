@@ -1,0 +1,22 @@
+{% load static %}
+<header>
+    <div class="logo">
+        <img src="{% static 'images/kisan_vishwa_logo.png' %}" alt="Kisan Vishwa Logo">
+    </div>
+    <nav>
+        <ul>
+            <li><a href="{% url 'admin_dashboard' %}" class="{% if request.path == '/' %}active{% endif %}">Home</a></li>
+            <li><a href="{% url 'admin_farmer_list' %}" class="{% if request.path == '/farmers/' %}active{% endif %}">Farmers</a></li>
+            <li><a href="{% url 'admin_customer_list' %}" class="{% if request.path == '/customers/' %}active{% endif %}">Customers</a></li>
+            <li><a href="{% url 'admin_product_list' %}" class="{% if request.path == '/products/' %}active{% endif %}">Products</a></li>
+            <li><a href="{% url 'admin_order_list' %}" class="{% if request.path == '/orders/' %}active{% endif %}">Orders</a></li>
+        </ul>
+    </nav>
+    <div class="search-cart">
+        <form action="#" method="get">
+            <input type="text" name="q" placeholder="Search...">
+        </form>
+        <a href="#" class="cart-icon"><i class="fas fa-shopping-cart"></i></a>
+        <a href="{% url 'logout' %}" class="logout-btn">Logout</a>
+    </div>
+</header>

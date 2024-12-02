@@ -10,10 +10,12 @@
 .home-nav {
     display: flex;
     align-items: center;
+    justify-content: space-between;
     background-color: var(--background-color);
     padding: 10px 20px;
     border-bottom: 1px solid #e0e0e0;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+    width: 100%;
 }
 
 .logo img {
@@ -27,13 +29,16 @@
     list-style: none;
     margin: 0;
     padding: 0;
-    flex-grow: 1;
-    justify-content: center;
+    align-items: center;
+    justify-content: flex-end;
+    flex: 1 1 auto;
 }
 
 /* Navigation Items */
 .nav-item {
-    margin-right: 20px;
+    margin: 0 15px;
+    display: flex;
+    align-items: center;
 }
 
 .nav-item a {
@@ -49,10 +54,11 @@
 
 /* Search and Cart Section */
 .search-cart {
-    margin-left: auto;
+    flex: 0 0 auto;
     display: flex;
     align-items: center;
     gap: 15px;
+    margin-left: 20px;
 }
 
 /* Search Input */

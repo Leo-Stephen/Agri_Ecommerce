@@ -1,36 +1,50 @@
 {% load static %}
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard</title>
     <link rel="stylesheet" href="{% static 'css/admin.css' %}">
+    <!-- FontAwesome for icons -->
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 </head>
+
 <body>
-    <header>
-        <div class="logo">
-            <img src="{% static 'images/kisan_vishwa_logo.png' %}" alt="Kisan Vishwa Logo">
-        </div>
-    </header>
+    <!-- Include Admin Navigation Bar -->
+    {% include 'NavBar/AdminNavBar.html' %}
+
+    <!-- Main Container -->
     <div class="container">
         <h1>Admin Dashboard</h1>
         <div class="stats">
+            <!-- Farmers Section -->
             <div class="stat-box">
+                <img src="{% static 'images/farmer_view.jpg' %}" alt="Farmers" class="section-image">
                 <h2>Farmers</h2>
                 <p>Total Farmers: {{ farmer_count }}</p>
                 <p><a href="{% url 'admin_farmer_list' %}">View All Farmers</a></p>
             </div>
+
+            <!-- Customers Section -->
             <div class="stat-box">
+                <img src="{% static 'images/customer_view.jpg' %}" alt="Customers" class="section-image">
                 <h2>Customers</h2>
                 <p>Total Customers: {{ customer_count }}</p>
                 <p><a href="{% url 'admin_customer_list' %}">View All Customers</a></p>
             </div>
+
+            <!-- Products Section -->
             <div class="stat-box">
+                <img src="{% static 'images/product_view.jpg' %}" alt="Products" class="section-image">
                 <h2>Products</h2>
                 <p>Total Products: {{ product_count }}</p>
                 <p><a href="{% url 'admin_product_list' %}">View All Products</a></p>
             </div>
+
+            <!-- Orders Section -->
             <div class="stat-box">
+                <img src="{% static 'images/order_view.jpeg' %}" alt="Orders" class="section-image">
                 <h2>Orders</h2>
                 <p>Total Orders: {{ order_count }}</p>
                 <p><a href="{% url 'admin_order_list' %}">View All Orders</a></p>
@@ -38,4 +52,5 @@
         </div>
     </div>
 </body>
+
 </html>
