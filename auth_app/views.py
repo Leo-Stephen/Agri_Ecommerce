@@ -76,17 +76,17 @@ def login_view(request):
 
 
 def logout_view(request):
-    # Clear all session data
-    request.session.flush()
-    # Clear session cookie
-    request.session.clear()
-    # Logout the user
-    logout(request)
-    # Redirect to homepage with a fresh session
-    response = redirect('HomePage')
-    response.delete_cookie('sessionid')
-    return response
-from django.shortcuts import redirect
-from django.contrib.auth import authenticate, login
-from django.contrib.auth.forms import AuthenticationForm
+    try:
+        # Clear all session data
+        request.session.flush()
+        # Logout the user
+        logout(request)
+        # Redirect to homepage
+        response = redirect('HomePage')
+        response.delete_cookie('sessionid')
+        return response
+    except Exception as e:
+        # Log the error if needed
+        messages.error(request, "Logout failed. Please try again.")
+        return redirect('HomePage')
 
