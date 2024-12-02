@@ -6,6 +6,17 @@ from .models import FarmerProfile, CustomerProfile
 from product_app.models import Product
 
 def HomePage(request):
+    # Check if user is authenticated but accessing homepage
+    if request.user.is_authenticated:
+        # Redirect based on user type
+        if request.user.is_superuser:
+            return redirect('admin_dashboard')
+        elif hasattr(request.user, 'farmerprofile'):
+            return redirect('farmer_dashboard')
+        elif hasattr(request.user, 'customerprofile'):
+            return redirect('customer_dashboard')
+    
+    # If not authenticated, show homepage
     return render(request, 'HomePage.html')
 
 
@@ -45,13 +56,15 @@ def login_view(request):
 
         if user is not None:
             login(request, user)
+            # Set session expiry to 0 to expire when browser closes
+            request.session.set_expiry(0)
 
             # Check user profile type and redirect accordingly
             if user.is_superuser:
-                return redirect('admin_dashboard')  # Redirect to admin dashboard
-            elif FarmerProfile.objects.filter(user=user).exists():
+                return redirect('admin_dashboard')
+            elif hasattr(user, 'farmerprofile'):
                 return redirect('farmer_dashboard')
-            elif CustomerProfile.objects.filter(user=user).exists():
+            elif hasattr(user, 'customerprofile'):
                 return redirect('customer_dashboard')
             else:
                 messages.error(request, "Profile not found.")
@@ -63,8 +76,16 @@ def login_view(request):
 
 
 def logout_view(request):
+    # Clear all session data
+    request.session.flush()
+    # Clear session cookie
+    request.session.clear()
+    # Logout the user
     logout(request)
-    return redirect('HomePage')
+    # Redirect to homepage with a fresh session
+    response = redirect('HomePage')
+    response.delete_cookie('sessionid')
+    return response
 from django.shortcuts import redirect
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.forms import AuthenticationForm

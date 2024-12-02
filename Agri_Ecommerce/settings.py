@@ -155,3 +155,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 RAZORPAY_KEY_ID = 'rzp_test_lNyuOZQFkbws4M'
 RAZORPAY_KEY_SECRET = 'DCjJxhEAvpGUObqNyjjJ6EkV'
+
+# Session Settings
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+SESSION_COOKIE_AGE = 86400  # 24 hours in seconds
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True  # This is the key setting
+SESSION_SAVE_EVERY_REQUEST = True
