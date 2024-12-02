@@ -1,25 +1,31 @@
-<nav>
-    <ul>
-        <li><a href="{% url 'HomePage' %}">Home</a></li>
-        <li><a href="#">Shop</a></li>
-        <li><a href="#">About Us</a></li>
-        <li><a href="#">Blog</a></li>
-        <li><a href="#">Contact</a></li>
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/home_navbar.css' %}">
+
+<nav class="home-nav">
+    <div class="logo">
+        <img src="{% static 'images/kisan_vishwa_logo.png' %}" alt="Kisan Vishwa Logo">
+    </div>
+    <ul class="nav-list">
+        <li class="nav-item"><a href="{% url 'HomePage' %}">Home</a></li>
+        <li class="nav-item"><a href="#">Shop</a></li>
+        <li class="nav-item"><a href="#">About Us</a></li>
+        <li class="nav-item"><a href="#">Blog</a></li>
+        <li class="nav-item"><a href="#">Contact</a></li>
         <li class="search-cart">
-            <input type="text" placeholder="Search...">
-            <a href="#" aria-label="Cart">🛒</a>
+            <input type="text" placeholder="Search..." class="search-input">
+            <a href="#" aria-label="Cart" class="cart-icon">🛒</a>
             {% if request.user.is_authenticated and request.session.session_key %}
                 {% if request.user.is_superuser %}
-                    <a href="{% url 'admin_dashboard' %}" class="admin-btn">Admin Dashboard</a>
+                    <a href="{% url 'admin_dashboard' %}" class="auth-btn admin-btn">Admin Dashboard</a>
                 {% elif request.user.farmerprofile %}
-                     <span>Welcome {{ request.user.farmerprofile.name }}</span>
+                    <span class="welcome-text">Welcome {{ request.user.farmerprofile.name }}</span>
                 {% elif request.user.customerprofile %}
-                    <span>Welcome {{ request.user.customerprofile.name }}</span>
+                    <span class="welcome-text">Welcome {{ request.user.customerprofile.name }}</span>
                 {% endif %}
-                <a href="{% url 'logout' %}" class="logout-btn">Logout</a>
+                <a href="{% url 'logout' %}" class="auth-btn login-btn">Logout</a>
             {% else %}
-                <a href="{% url 'login' %}" class="login-btn">Login</a>
-                <a href="{% url 'register' %}" class="signup-btn">Sign Up</a>
+                <a href="{% url 'login' %}" class="auth-btn login-btn">Login</a>
+                <a href="{% url 'register' %}" class="auth-btn signup-btn">Sign Up</a>
             {% endif %}
         </li>
     </ul>
