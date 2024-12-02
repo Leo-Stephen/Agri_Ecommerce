@@ -16,8 +16,15 @@ def HomePage(request):
         elif hasattr(request.user, 'customerprofile'):
             return redirect('customer_dashboard')
     
-    # If not authenticated, show homepage
-    return render(request, 'HomePage.html')
+    # Get featured products for homepage
+    featured_products = Product.objects.filter(
+        is_featured=True,
+        is_deleted=False
+    ).order_by('-created_at')[:10]  # Limit to 10 products
+    
+    return render(request, 'HomePage.html', {
+        'featured_products': featured_products
+    })
 
 
 def register(request):

@@ -136,9 +136,11 @@ body {
 }
 
 .product-grid {
-  display: grid; /* Use grid layout */
-  grid-template-columns: repeat(4, 1fr); /* Four columns for larger screens */
-  gap: 20px; /* Space between products */
+  display: grid;
+  grid-template-columns: repeat(5, 1fr); /* Five columns for larger screens */
+  gap: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
 .featured-products {
@@ -215,21 +217,27 @@ body {
 }
 
 /* Media Queries */
-@media (max-width: 1024px) {
+@media (max-width: 1200px) {
   .product-grid {
-    grid-template-columns: repeat(3, 1fr); /* Three columns for tablets */
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (max-width: 992px) {
+  .product-grid {
+    grid-template-columns: repeat(3, 1fr);
   }
 }
 
 @media (max-width: 768px) {
   .product-grid {
-    grid-template-columns: repeat(2, 1fr); /* Two columns for mobile */
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
 @media (max-width: 480px) {
   .product-grid {
-    grid-template-columns: 1fr; /* One column for very small screens */
+    grid-template-columns: 1fr;
   }
 }
 
@@ -685,28 +693,4 @@ footer {
   footer {
     padding: 20px 10px; /* Reduced padding */
   }
-}
-
-nav ul {
-  list-style-type: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  align-items: center;
-  height: 100%;
-  position: relative;
-  /* Remove justify-content: center */
-}
-
-/* New: Create a container for main nav items */
-nav ul li:not(.search-cart) {
-  margin-left: auto;  /* Push main nav items to center */
-}
-
-/* Adjust search-cart position */
-.search-cart {
-  margin-left: auto;  /* Push to right */
-  display: flex;
-  align-items: center;
-  gap: 15px;
 }

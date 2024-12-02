@@ -84,85 +84,18 @@
 <section class="featured-products">
     <h2>Featured Products</h2>
     <div class="product-grid">
-        <!-- Product 1 -->
-        <div class="product-card">
-            <div class="image-container">
-                <img src="{% static 'images/organic_tomato_seeds.jpg' %}" alt="Organic Tomato Seeds">
+        {% for product in featured_products %}
+            <div class="product-card">
+                <div class="image-container">
+                    <img src="{{ product.get_image_url }}" alt="{{ product.name }}">
+                </div>
+                <h3>{{ product.name }}</h3>
+                <p class="price">₹{{ product.price }}</p>
+                <button class="cta-btn" onclick="redirectToRegister()">Add to Cart</button>
             </div>
-            <h3>Organic Tomato Seeds</h3>
-            <p class="price">₹150</p>
-            <button class="cta-btn" onclick="redirectToRegister()">Add to Cart</button>
-        </div>
-
-        <!-- Product 2 -->
-        <div class="product-card">
-            <div class="image-container">
-                <img src="{% static 'images/organic_fertilizer.jpg' %}" alt="Organic All-Purpose Fertilizer">
-            </div>
-            <h3>Organic All-Purpose Fertilizer</h3>
-            <p class="price">₹250</p>
-            <button class="cta-btn" onclick="redirectToRegister()">Add to Cart</button>
-        </div>
-
-        <!-- Product 3 -->
-        <div class="product-card">
-            <div class="image-container">
-                <img src="{% static 'images/neem_oil_spray.jpg' %}" alt="Neem Oil Spray">
-            </div>
-            <h3>Neem Oil Spray</h3>
-            <p class="price">₹200</p>
-            <button class="cta-btn" onclick="redirectToRegister()">Add to Cart</button>
-        </div>
-
-        <!-- Product 4 -->
-        <div class="product-card">
-            <div class="image-container">
-                <img src="{% static 'images/hand_trowel.jpg' %}" alt="Hand Trowel">
-            </div>
-            <h3>Hand Trowel</h3>
-            <p class="price">₹180</p>
-            <button class="cta-btn" onclick="redirectToRegister()">Add to Cart</button>
-        </div>
-
-        <!-- Product 5 -->
-        <div class="product-card">
-            <div class="image-container">
-                <img src="{% static 'images/collapsible_basket.jpg' %}" alt="Collapsible Harvest Basket">
-            </div>
-            <h3>Collapsible Harvest Basket</h3>
-            <p class="price">₹350</p>
-            <button class="cta-btn" onclick="redirectToRegister()">Add to Cart</button>
-        </div>
-
-        <!-- Product 6 -->
-        <div class="product-card">
-            <div class="image-container">
-                <img src="{% static 'images/organic_chicken_feed.jpg' %}" alt="Organic Chicken Feed">
-            </div>
-            <h3>Organic Chicken Feed</h3>
-            <p class="price">₹400</p>
-            <button class="cta-btn" onclick="redirectToRegister()">Add to Cart</button>
-        </div>
-
-        <!-- Product 7 -->
-        <div class="product-card">
-            <div class="image-container">
-                <img src="{% static 'images/manual_seed_planter.jpg' %}" alt="Manual Seed Planter">
-            </div>
-            <h3>Manual Seed Planter</h3>
-            <p class="price">₹300</p>
-            <button class="cta-btn" onclick="redirectToRegister()">Add to Cart</button>
-        </div>
-
-        <!-- Product 8 -->
-        <div class="product-card">
-            <div class="image-container">
-                <img src="{% static 'images/biodegradable_pots.jpg' %}" alt="Biodegradable Seedling Pots">
-            </div>
-            <h3>Biodegradable Seedling Pots</h3>
-            <p class="price">₹120</p>
-            <button class="cta-btn" onclick="redirectToRegister()">Add to Cart</button>
-        </div>
+        {% empty %}
+            <p>No featured products available at the moment.</p>
+        {% endfor %}
     </div>
 </section>
 
