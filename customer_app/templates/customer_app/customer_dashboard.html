@@ -13,14 +13,19 @@
     <link rel="stylesheet" type="text/css" href="{% static 'css/CustomerNavBar.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'css/customerdesign.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'css/customer_dashboard.css' %}">
+    <link rel="stylesheet" href="{% static 'css/chat_widget.css' %}">
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
 </head>
 <body>
     {% include 'NavBar/CustomerNavBar.html' %}
     
-    <!-- Add a spacer div -->
-    <div style="height: 20px;"></div>
+    <!-- Place chat widget container after navbar -->
+    <div id="chat-widget-container">
+        {% include 'chatbot_app/chat_widget.html' %}
+    </div>
     
-    <main class="dashboard-container">
+    <!-- Rest of your dashboard content -->
+    <div class="dashboard-container">
         <!-- Welcome Section -->
         <section class="welcome-section">
             <div class="welcome-content">
@@ -180,7 +185,7 @@
                 {% endif %}
             </section>
         </div>
-    </main>
+    </div>
 
     <script>
         // Update current date
@@ -303,6 +308,25 @@
             addToCartButtons.forEach(button => {
                 button.addEventListener('click', debounce(handleAddToCart, 300));
             });
+
+            // Add chat widget functionality
+            const chatWidget = document.querySelector('.chat-widget');
+            const chatToggle = document.querySelector('.chat-widget-toggle');
+            const chatClose = document.querySelector('.chat-close');
+
+            if (chatToggle) {
+                chatToggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    chatWidget.classList.toggle('chat-widget-expanded');
+                });
+            }
+
+            if (chatClose) {
+                chatClose.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    chatWidget.classList.remove('chat-widget-expanded');
+                });
+            }
         });
 
         // Enhanced toast notification

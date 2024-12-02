@@ -691,3 +691,19 @@
     align-items: center;
     gap: 8px;
 }
+
+/* Chat widget specific styles */
+#chat-widget-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1100; /* Higher than toast notifications (1000) */
+}
+
+.chat-widget {
+    z-index: 1100;
+}
+
+.chat-widget-expanded {
+    z-index: 1100;
+}

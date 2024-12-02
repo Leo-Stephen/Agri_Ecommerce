@@ -192,9 +192,10 @@
                     </div>
                     <form method="post" action="{% url 'checkout' %}">
                         {% csrf_token %}
-                    <button class="checkout-btn">
-                        <i class="fas fa-lock"></i> Proceed to Checkout
-                    </button>
+                        <button class="checkout-btn">
+                            <i class="fas fa-lock"></i> Proceed to Checkout
+                        </button>
+                    </form>
                     <a href="{% url 'customer_dashboard' %}" class="continue-shopping">
                         <i class="fas fa-arrow-left"></i> Continue Shopping
                     </a>
