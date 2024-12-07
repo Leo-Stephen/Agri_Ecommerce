@@ -12,60 +12,72 @@
 </head>
 <body>
     <div class="login-container">
-        <div class="bg-image" style="background-image: url('{% static 'images/loginimage.jpg' %}')">
+        <div class="bg-image">
             <div class="overlay">
-                <div class="container content">
-                    <main class="row h-100">
-                        <div class="col-lg-6 d-flex flex-column justify-content-center">
+                <main class="row h-100">
+                    <div class="col-lg-6 left-section">
+                        <div class="left-content">
                             <header>
-                                <h1 class="welcome-text mb-4">Welcome<br>Back</h1>
+                                <h1 class="welcome-text">Welcome<br>Back</h1>
                             </header>
-                            <p class="mb-4 lead caption">Connecting farmers to the world, offering you fresh organic produce at your fingertips. Log in to explore a marketplace where nature meets convenience.</p>
-                            <nav class="social-icons mb-4">
+                            <p class="caption">Connecting farmers to the world, offering you fresh organic produce at your fingertips. Log in to explore a marketplace where nature meets convenience.</p>
+                            <nav class="social-icons">
                                 <a href="#" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
                                 <a href="#" aria-label="Twitter"><i class="bi bi-twitter"></i></a>
                                 <a href="#" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
                                 <a href="#" aria-label="LinkedIn"><i class="bi bi-linkedin"></i></a>
                             </nav>
                         </div>
-                        <div class="col-lg-6 d-flex align-items-center">
-                            <div class="login-form w-100">
-                                <h2 class="mb-4 fw-bold">Sign in</h2>
-                                <!-- Use Django form rendering if you're using a form -->
-                                <form method="POST" novalidate>
-                                    {% csrf_token %}
-                                    <div class="mb-3">
-                                        <input type="text" class="form-control" name="username" placeholder="Username" required aria-label="Username">
-                                        <div class="invalid-feedback">Please enter a valid username.</div>
-                                    </div>
-                                    <div class="mb-3">
-                                        <input type="password" class="form-control" name="password" placeholder="Password" required aria-label="Password">
-                                        <div class="invalid-feedback">Please enter your password.</div>
-                                    </div>
-                                    <div class="mb-4 form-check">
-                                        <input type="checkbox" class="form-check-input" id="remember" name="remember">
-                                        <label class="form-check-label" for="remember">Remember Me</label>
-                                    </div>
-                                    <button type="submit" class="btn btn-login text-white w-100 mb-3">Sign in now</button>
-                                    <div class="d-flex justify-content-between align-items-center mb-4">
-                                        <a href="#" class="text-white text-decoration-none">Lost your password?</a>
-                                        <a href="{% url 'register' %}" class="text-white text-decoration-underline">Create an account</a>
-                                    </div>
-                                    <div class="mb-4 form-check">
-                                        <input type="checkbox" class="form-check-input" id="terms" required>
-                                        <label class="form-check-label text-white" for="terms">
-                                            I agree to the
-                                            <a href="#" class="text-white text-decoration-underline">Terms of Service</a>
-                                            and
-                                            <a href="#" class="text-white text-decoration-underline">Privacy Policy</a>
-                                        </label>
-                                        <div class="invalid-feedback">You must agree to the terms and conditions.</div>
-                                    </div>
-                                </form>
-                            </div>
+                    </div>
+                    <div class="col-lg-6 right-section">
+                        <div class="login-form w-100">
+                            <h2 class="mb-4 fw-bold">Sign in</h2>
+                            <!-- Use Django form rendering if you're using a form -->
+                            <form method="POST" novalidate>
+                                {% csrf_token %}
+                                <div class="mb-3">
+                                    <input type="text" class="form-control" name="username" placeholder="Username" required aria-label="Username">
+                                    <div class="invalid-feedback">Please enter a valid username.</div>
+                                </div>
+                                <div class="mb-3">
+                                    <input type="password" class="form-control" name="password" placeholder="Password" required aria-label="Password">
+                                    <div class="invalid-feedback">Please enter your password.</div>
+                                </div>
+                                <div class="mb-4 form-check">
+                                    <input type="checkbox" class="form-check-input" id="remember" name="remember">
+                                    <label class="form-check-label" for="remember">Remember Me</label>
+                                </div>
+                                <button type="submit" class="btn btn-login text-white w-100 mb-3">Sign in now</button>
+                                <div class="d-flex justify-content-between align-items-center mb-4">
+                                    <a href="#" class="text-white text-decoration-none">Lost your password?</a>
+                                    <a href="{% url 'register' %}" class="text-white text-decoration-underline">Create an account</a>
+                                </div>
+                                <div class="mb-4 form-check">
+                                    <input type="checkbox" class="form-check-input" id="terms" required>
+                                    <label class="form-check-label text-white" for="terms">
+                                        I agree to the
+                                        <a href="#" class="text-white text-decoration-underline">Terms of Service</a>
+                                        and
+                                        <a href="#" class="text-white text-decoration-underline">Privacy Policy</a>
+                                    </label>
+                                    <div class="invalid-feedback">You must agree to the terms and conditions.</div>
+                                </div>
+                                <script>
+                                    document.addEventListener('DOMContentLoaded', function() {
+                                        const form = document.querySelector('form');
+                                        form.addEventListener('submit', function(e) {
+                                            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+                                            if (!csrfToken) {
+                                                e.preventDefault();
+                                                alert('CSRF token is missing. Please refresh the page and try again.');
+                                            }
+                                        });
+                                    });
+                                </script>
+                            </form>
                         </div>
-                    </main>
-                </div>
+                    </div>
+                </main>
             </div>
         </div>
     </div>

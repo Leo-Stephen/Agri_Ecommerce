@@ -5,6 +5,9 @@ from .models import Order, OrderItem
 from customer_app.models import CartItem  # Assuming Cart is in customer_app
 from django.contrib.auth.decorators import login_required
 from customer_app.models import CartItem
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from django.contrib import messages
 
 # Razorpay client setup
 razorpay_client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
@@ -73,7 +76,35 @@ def payment_callback(request):
             # Clear the cart
             CartItem.objects.filter(user=request.user).delete()  # Clear CartItems for the user
 
-            return redirect('order_success')  # Redirect to order success page
+            # Send confirmation email
+            try:
+                # Prepare email content
+                context = {
+                    'user': request.user,
+                    'order': order,
+                    'order_items': order_items,
+                    'total_amount': total_amount,
+                }
+                
+                # Render email content from template
+                html_message = render_to_string('order_app/email/order_confirmation.html', context)
+                plain_message = render_to_string('order_app/email/order_confirmation.txt', context)
+                
+                # Send email
+                send_mail(
+                    subject=f'Order Confirmation - Order #{order.order_id}',
+                    message=plain_message,
+                    from_email=settings.EMAIL_HOST_USER,
+                    recipient_list=[request.user.email],
+                    html_message=html_message,
+                    fail_silently=False,
+                )
+                
+            except Exception as e:
+                # Log the error but don't stop the order process
+                print(f"Failed to send confirmation email: {str(e)}")
+            
+            return redirect('order_success')
         except Exception as e:
             print(f"Error during payment callback: {e}")
             return redirect('order_failed')  # Redirect to order failure page
@@ -106,3 +137,17 @@ def track_order(request, order_id):
         'order': order,
         'order_statuses': order_statuses
     })
+
+def test_email(request):
+    try:
+        send_mail(
+            'Test Email',
+            'This is a test email from your Django app.',
+            settings.EMAIL_HOST_USER,
+            [request.user.email],
+            fail_silently=False,
+        )
+        messages.success(request, "Test email sent successfully!")
+    except Exception as e:
+        messages.error(request, f"Failed to send email: {str(e)}")
+    return redirect('HomePage')
