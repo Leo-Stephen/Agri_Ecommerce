@@ -14,17 +14,17 @@ def admin_check(user):
 @login_required
 @user_passes_test(admin_check)
 def admin_dashboard(request):
-    # Count the number of farmers, customers, products, and cart items
+    # Count the number of farmers, customers, products, and orders
     farmer_count = FarmerProfile.objects.count()
     customer_count = CustomerProfile.objects.count()
     product_count = Product.objects.count()
-    cart_item_count = CartItem.objects.count()  # Count CartItem entries as a substitute for orders
+    order_count = Order.objects.count()  # Add this line
 
     context = {
         'farmer_count': farmer_count,
         'customer_count': customer_count,
         'product_count': product_count,
-        'cart_item_count': cart_item_count,
+        'order_count': order_count,  # Add this to context
     }
 
     # Render the admin dashboard template
@@ -89,9 +89,21 @@ def product_list(request):
 @login_required
 @user_passes_test(admin_check)
 def order_list(request):
-    cart_items = CartItem.objects.all()  # Get all cart items
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        if action == 'remove_order':
+            order_id = request.POST.get('order_id')
+            try:
+                order = Order.objects.get(order_id=order_id)
+                order.delete()
+                messages.success(request, f'Order #{order_id} has been removed successfully.')
+            except Order.DoesNotExist:
+                messages.error(request, 'Order not found.')
+            return redirect('admin_order_list')
+
+    orders = Order.objects.all().order_by('-created_at')
     context = {
-        'cart_items': cart_items,
+        'orders': orders,
     }
     return render(request, 'admin_app/order_list.html', context)
 
