@@ -114,7 +114,9 @@
                                     </p>
                                     <p class="order-price">₹{{ order.total_price }}</p>
                                 </div>
-                                <a href="#" class="track-order-btn">Track Order</a>
+                                <a href="{% url 'track_order' order.order_id %}" class="track-order-btn">
+                                    <i class="fas fa-truck"></i> Track Order
+                                </a>
                             </div>
                         {% endfor %}
                     {% else %}

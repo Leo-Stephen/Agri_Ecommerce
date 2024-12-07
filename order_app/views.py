@@ -1,9 +1,10 @@
 import razorpay
 from django.conf import settings
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404  # Add get_object_or_404
 from .models import Order, OrderItem
 from customer_app.models import CartItem  # Assuming Cart is in customer_app
 from django.contrib.auth.decorators import login_required
+from customer_app.models import CartItem
 
 # Razorpay client setup
 razorpay_client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
@@ -87,3 +88,21 @@ def order_success(request):
 @login_required
 def order_failed(request):
     return render(request, 'order_app/order_failed.html')
+
+@login_required
+def track_order(request, order_id):
+    order = get_object_or_404(Order, order_id=order_id, user=request.user)
+    
+    # Get all possible statuses for the timeline
+    order_statuses = [
+        ('PENDING', 'Order Placed'),
+        ('PROCESSING', 'Processing'),
+        ('SHIPPED', 'Shipped'),
+        ('OUT_FOR_DELIVERY', 'Out for Delivery'),
+        ('DELIVERED', 'Delivered')
+    ]
+    
+    return render(request, 'order_app/track_order.html', {
+        'order': order,
+        'order_statuses': order_statuses
+    })

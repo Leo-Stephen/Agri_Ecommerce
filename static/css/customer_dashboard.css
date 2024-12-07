@@ -707,3 +707,21 @@
 .chat-widget-expanded {
     z-index: 1100;
 }
+
+/* Add these styles */
+.track-order-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: var(--primary-color);
+    color: var(--white);
+    border-radius: 6px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.track-order-btn:hover {
+    background: var(--secondary-color);
+    transform: translateY(-2px);
+}
