@@ -35,4 +35,18 @@ document.addEventListener('DOMContentLoaded', function () {
         wrap: true,
         keyboard: true
     });
+
+    // Smooth Scroll functionality
+    document.querySelectorAll('.nav-item a').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+            e.preventDefault();
+
+            const target = document.querySelector(this.getAttribute('href'));
+
+            target.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+        });
+    });
 });

@@ -43,7 +43,7 @@
     {% include 'NavBar/HomeNavBar.html' %}
 
     <!-- Slider Wrapper -->
-    <div class="slider-wrapper">
+    <div class="slider-wrapper" id="slider-wrapper">
         <!-- Slideshow Section -->
         <div class="slideshow-container swiper-container">
             <div class="swiper-wrapper">
@@ -81,7 +81,7 @@
             <div class="swiper-pagination"></div>
         </div>
     </div>
-<section class="featured-products">
+<section class="featured-products" id="featured-products">
     <h2>Featured Products</h2>
     <div class="product-grid">
         {% for product in featured_products %}
@@ -106,7 +106,7 @@
     }
 </script>
 
-<section class="blog-highlights">
+<section class="blog-highlights" id="blog-highlights">
     <h2>From Our Blog</h2>
     <div class="blog-grid">
         <!-- Blog Post 1 -->
@@ -159,7 +159,7 @@
 </script>
 
 
-<section class="customer-stories">
+<section class="customer-stories" id="customer-stories">
     <div class="container">
         <h2 class="text-center mb-5">Customer Stories</h2>
         <div class="testimonial-carousel-wrapper"> <!-- New Wrapper Div -->
@@ -262,7 +262,7 @@
         </div>
     </div>
 </section>
-<section class="about">
+<section class="about" id="about">
     <h2>About Us</h2>
     <div class="about-content">
         <div class="about-text">
@@ -308,7 +308,7 @@
                 <a href="#twitter" class="social-icon">Twitter</a>
             </div>
         </div>
-        <div class="contact-info">
+        <div class="contact-info" id="contact-info">
             <h3>Contact Info</h3>
             <p>Address: 123 Agri Lane, Farm City, State, ZIP</p>
             <p>Phone: +1 (234) 567-8901</p>
