@@ -374,3 +374,111 @@ header {
         justify-content: center;
     }
 }
+
+/* Table Container */
+.table-container {
+    background: var(--card-background);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-lg);
+    box-shadow: var(--shadow-medium);
+    margin-top: var(--spacing-xl);
+    overflow-x: auto;
+}
+
+/* Enhanced Table Styles */
+.styled-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 1rem;
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+}
+
+.styled-table thead {
+    background-color: var(--primary-color);
+}
+
+.styled-table th {
+    color: var(--text-light);
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    padding: var(--spacing-md) var(--spacing-lg);
+    text-align: left;
+}
+
+.styled-table td {
+    padding: var(--spacing-md) var(--spacing-lg);
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-secondary);
+}
+
+/* Customer Info */
+.customer-info {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.customer-info i {
+    color: var(--primary-color);
+    font-size: 1.1rem;
+}
+
+/* Order Count */
+.order-count {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: rgba(40, 167, 69, 0.1);
+    color: var(--primary-color);
+    padding: 6px 12px;
+    border-radius: var(--radius-sm);
+    font-weight: 500;
+}
+
+.order-label {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    font-weight: normal;
+}
+
+/* Action Buttons */
+.action-buttons {
+    display: flex;
+    gap: var(--spacing-sm);
+}
+
+.btn-delete {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background-color: #dc3545;
+    color: var(--text-light);
+    border: none;
+    padding: 8px 12px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+}
+
+.btn-delete:hover {
+    background-color: #c82333;
+    transform: translateY(-2px);
+}
+
+/* Responsive Table */
+@media (max-width: 768px) {
+    .styled-table {
+        font-size: 0.9rem;
+    }
+
+    .styled-table th, 
+    .styled-table td {
+        padding: var(--spacing-sm);
+    }
+
+    .btn-delete span {
+        display: none;
+    }
+}
