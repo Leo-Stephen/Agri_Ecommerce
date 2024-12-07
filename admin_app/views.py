@@ -4,6 +4,7 @@ from auth_app.models import FarmerProfile, CustomerProfile
 from product_app.models import Product
 from customer_app.models import CartItem  # Use CartItem instead of an Order model
 from order_app.models import Order  # Import Order model
+from django.contrib import messages
 
 # Custom check to ensure only superusers can access the admin dashboard
 def admin_check(user):
@@ -56,14 +57,25 @@ def customer_list(request):
 @login_required
 @user_passes_test(admin_check)
 def product_list(request):
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        if action == 'remove_product':
+            product_id = request.POST.get('product_id')
+            try:
+                product = Product.objects.get(id=product_id)
+                product.delete()  # Or product.soft_delete() if you have soft delete
+                messages.success(request, f'Product "{product.name}" has been removed successfully.')
+            except Product.DoesNotExist:
+                messages.error(request, 'Product not found.')
+            return redirect('admin_product_list')
+
     # Get all farmers with their products
     farmers = FarmerProfile.objects.all()
     farmer_products = {}
     
     for farmer in farmers:
-        # Get products for each farmer
         products = Product.objects.filter(farmer=farmer.user)
-        if products.exists():  # Only add farmers who have products
+        if products.exists():
             farmer_products[farmer] = products
 
     context = {
