@@ -101,9 +101,18 @@ def order_list(request):
                 messages.error(request, 'Order not found.')
             return redirect('admin_order_list')
 
-    orders = Order.objects.all().order_by('-created_at')
+    # Get all customers with their orders
+    customers = CustomerProfile.objects.all()
+    customer_orders = {}
+    
+    for customer in customers:
+        orders = Order.objects.filter(user=customer.user).order_by('-created_at')
+        if orders.exists():  # Only add customers who have orders
+            customer_orders[customer] = orders
+
     context = {
-        'orders': orders,
+        'customer_orders': customer_orders,
+        'total_orders': Order.objects.count(),
     }
     return render(request, 'admin_app/order_list.html', context)
 

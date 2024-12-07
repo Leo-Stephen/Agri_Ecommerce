@@ -29,61 +29,74 @@
 
         <div class="dashboard-header">
             <h1>Order Management</h1>
-            <p class="subtitle">Total Orders: {{ orders.count }}</p>
+            <p class="subtitle">Total Orders: {{ total_orders }}</p>
         </div>
 
-        <div class="table-container">
-            <table class="styled-table">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Order ID</th>
-                        <th>Customer</th>
-                        <th>Amount</th>
-                        <th>Status</th>
-                        <th>Date</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for order in orders %}
-                    <tr>
-                        <td>{{ forloop.counter }}</td>
-                        <td>
-                            <div class="order-info">
-                                <i class="fas fa-shopping-bag"></i>
-                                <span>{{ order.order_id }}</span>
-                            </div>
-                        </td>
-                        <td>{{ order.user.username }}</td>
-                        <td>₹{{ order.amount }}</td>
-                        <td>
-                            <span class="status-badge status-{{ order.status|lower }}">
-                                {{ order.status }}
-                            </span>
-                        </td>
-                        <td>{{ order.created_at|date:"d M Y" }}</td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="btn-delete" 
-                                        onclick="confirmDelete('{{ order.order_id }}')">
-                                    <i class="fas fa-trash"></i>
-                                    <span>Remove</span>
-                                </button>
-                                <form id="delete-form-{{ order.order_id }}" 
-                                      method="post" 
-                                      style="display: none;">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="action" value="remove_order">
-                                    <input type="hidden" name="order_id" value="{{ order.order_id }}">
-                                </form>
-                            </div>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+        {% for customer, orders in customer_orders.items %}
+        <div class="customer-section">
+            <div class="customer-header">
+                <div class="customer-info">
+                    <i class="fas fa-user"></i>
+                    <h2>{{ customer.user.username }}</h2>
+                </div>
+                <span class="order-count">
+                    {{ orders.count }}
+                    <span class="order-label">orders</span>
+                </span>
+            </div>
+
+            <div class="table-container">
+                <table class="styled-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Order ID</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in orders %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>
+                                <div class="order-info">
+                                    <i class="fas fa-shopping-bag"></i>
+                                    <span>{{ order.order_id }}</span>
+                                </div>
+                            </td>
+                            <td>₹{{ order.amount }}</td>
+                            <td>
+                                <span class="status-badge status-{{ order.status|lower }}">
+                                    {{ order.status }}
+                                </span>
+                            </td>
+                            <td>{{ order.created_at|date:"d M Y" }}</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="btn-delete" 
+                                            onclick="confirmDelete('{{ order.order_id }}')">
+                                        <i class="fas fa-trash"></i>
+                                        <span>Remove</span>
+                                    </button>
+                                    <form id="delete-form-{{ order.order_id }}" 
+                                          method="post" 
+                                          style="display: none;">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="action" value="remove_order">
+                                        <input type="hidden" name="order_id" value="{{ order.order_id }}">
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
+        {% endfor %}
     </div>
 
     <script>
