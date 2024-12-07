@@ -49,3 +49,21 @@ class Product(models.Model):
     @property
     def status(self):
         return 'Inactive' if self.is_deleted else 'Active'
+
+    @property
+    def stock_status(self):
+        if self.quantity > 20:
+            return "In Stock"
+        elif 1 <= self.quantity <= 20:
+            return "Low Stock"
+        else:
+            return "Out of Stock"
+
+    @property
+    def stock_status_color(self):
+        if self.quantity > 20:
+            return "success"  # Green
+        elif 1 <= self.quantity <= 20:
+            return "warning"  # Orange
+        else:
+            return "danger"   # Red

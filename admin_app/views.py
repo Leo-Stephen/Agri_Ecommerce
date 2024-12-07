@@ -34,7 +34,7 @@ def admin_dashboard(request):
 @login_required
 @user_passes_test(admin_check)
 def farmer_list(request):
-    farmers = FarmerProfile.objects.all()  # Get all farmers
+    farmers = FarmerProfile.objects.all()
     context = {
         'farmers': farmers,
     }
@@ -56,9 +56,19 @@ def customer_list(request):
 @login_required
 @user_passes_test(admin_check)
 def product_list(request):
-    products = Product.objects.all()  # Get all products
+    # Get all farmers with their products
+    farmers = FarmerProfile.objects.all()
+    farmer_products = {}
+    
+    for farmer in farmers:
+        # Get products for each farmer
+        products = Product.objects.filter(farmer=farmer.user)
+        if products.exists():  # Only add farmers who have products
+            farmer_products[farmer] = products
+
     context = {
-        'products': products,
+        'farmer_products': farmer_products,
+        'total_products': Product.objects.count(),
     }
     return render(request, 'admin_app/product_list.html', context)
 
